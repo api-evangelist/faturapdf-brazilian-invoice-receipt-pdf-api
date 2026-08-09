@@ -1,0 +1,96 @@
+generated: '2026-08-09'
+method: derived
+source: >-
+  Derived from openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
+  (securitySchemes, response media types, error schema), the harvested
+  /.well-known/ documents, and explicit scope statements the provider publishes at
+  https://faturapdf.com/terms/ and https://faturapdf.com/guides/brazilian-fiscal-documents/.
+standards:
+  - id: openapi-3.0
+    conforms: true
+    evidence: >-
+      Provider publishes OpenAPI 3.0.3 at https://faturapdf.com/openapi.yaml —
+      3 operations, all with operationId, summary, description, tags, request/response
+      examples and a declared securityScheme.
+  - id: apis-json
+    conforms: true
+    evidence: >-
+      APIs.json 0.16 index published at https://faturapdf.com/apis.json (aid com.faturapdf).
+  - id: rfc9116-security-txt
+    conforms: true
+    evidence: >-
+      /.well-known/security.txt returns 200 with Contact, Expires, Preferred-Languages,
+      Canonical and Policy fields.
+  - id: api-onboarding-descriptor
+    conforms: true
+    evidence: >-
+      /.well-known/api-onboarding returns an aod 0.1 descriptor covering account,
+      registration, authentication, credentials, scopes, flow and economics.
+  - id: llms-txt
+    conforms: true
+    evidence: https://faturapdf.com/llms.txt returns 200 text/plain in llms.txt format.
+  - id: api-key-header-auth
+    conforms: true
+    evidence: >-
+      openapi securitySchemes declare apiKey-in-header RapidAPIKey (X-RapidAPI-Key)
+      and RapidAPIHost (X-RapidAPI-Host).
+  - id: oauth2
+    conforms: false
+    evidence: >-
+      No oauth2 securityScheme in the OpenAPI; /.well-known/oauth-authorization-server
+      404s. The onboarding descriptor states the permission model is "quota-tiers",
+      with no per-scope permissions.
+  - id: oidc
+    conforms: false
+    evidence: /.well-known/openid-configuration returns 404 on faturapdf.com.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: >-
+      Errors use a custom JSON envelope {error, message} served as application/json,
+      not application/problem+json. See errors/faturapdf-brazilian-invoice-receipt-pdf-api-problem-types.yml.
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: No deprecation policy or Sunset/Deprecation header documented.
+  - id: idempotency
+    conforms: true
+    evidence: >-
+      No Idempotency-Key header, but generation is documented as a pure function of
+      the request body with no server-side state — "the same body always produces the
+      same document, and nothing is stored on the server. That makes retries safe"
+      (https://faturapdf.com/guides/generate-invoice-pdf-nodejs/). Retry semantics and
+      a retryable-status set are published. See
+      conventions/faturapdf-brazilian-invoice-receipt-pdf-api-conventions.yml.
+  - id: pagination
+    conforms: false
+    evidence: >-
+      No collection endpoints — the API is 2 POST document-generation operations plus
+      a health check. Pagination is not applicable; internal PDF page pagination is a
+      rendering feature, not an API convention.
+  - id: asyncapi-events
+    conforms: false
+    evidence: >-
+      No event, streaming or webhook surface. The provider states the API is purely
+      synchronous request/response: "There is nothing to poll, no webhook to wire up,
+      and no file to fetch afterwards" (https://faturapdf.com/).
+  - id: nfe-nfse-fiscal-issuance
+    conforms: false
+    evidence: >-
+      Explicitly and repeatedly out of scope. The provider states it does not talk to
+      SEFAZ or any municipal NFS-e system, does not issue or cancel NF-e/NFC-e/NFS-e,
+      and produces no chave de acesso, protocolo de autorizacao, DANFE or signed XML.
+      Recorded here because a Brazilian invoicing API is routinely mis-cited as a
+      fiscal issuer.
+  - id: pix-br-code-emv
+    conforms: partial
+    evidence: >-
+      The API renders a PIX "copia e cola" EMV BR Code supplied by the caller in
+      pix_copia_cola as a QR image on the PDF. It never mints a BR Code, so it
+      implements the rendering side only, not payload generation.
+compliance_program:
+  published: false
+  note: >-
+    No SOC 2 / ISO 27001 / PCI DSS / HIPAA claims and no trust center. The provider
+    instead publishes a plain-language data-handling statement at
+    https://faturapdf.com/terms/ (stateless generation, nothing persisted, payload
+    contents not logged) and states plainly that there is no SLA. That is a
+    transparency posture, not a certification, so no Compliance pointer is emitted.

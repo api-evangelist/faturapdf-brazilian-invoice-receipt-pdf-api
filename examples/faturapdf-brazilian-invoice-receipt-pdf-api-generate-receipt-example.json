@@ -1,0 +1,32 @@
+{
+  "x-generated": "2026-08-09",
+  "x-method": "derived",
+  "x-source": "openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateReceipt (request example published verbatim by the provider)",
+  "operationId": "generateReceipt",
+  "request": {
+    "method": "POST",
+    "url": "https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com/receipt",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",
+      "X-RapidAPI-Host": "brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com"
+    },
+    "body": {
+      "numero": "R-0087",
+      "emitente": { "nome": "Ana Luglio", "documento": "529.982.247-25" },
+      "destinatario": { "nome": "Leonardo Sanches", "documento": "390.533.447-05" },
+      "itens": [{ "descricao": "Consultoria avulsa", "valor_unitario": 450 }],
+      "forma_pagamento": "Transferência bancária"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/pdf" },
+    "body": "<raw PDF bytes — recibo layout: 'Recebemos de ...' statement, amount in words, signature line>",
+    "sample_output": "https://faturapdf.com/samples/recibo-exemplo.pdf"
+  },
+  "notes": [
+    "tipo is forced to \"recibo\" server-side on this endpoint; the amount in words is automatic.",
+    "Names and tax IDs are the provider's own fictitious, check-digit-valid test values."
+  ]
+}

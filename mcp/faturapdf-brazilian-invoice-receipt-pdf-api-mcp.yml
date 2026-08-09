@@ -1,0 +1,44 @@
+generated: '2026-08-09'
+method: derived
+status: candidate
+source: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
+search_result: >-
+  No MCP server exists. Probed 2026-08-09: https://faturapdf.com/mcp 404,
+  https://faturapdf.com/.well-known/mcp.json 404, no mcp.* subdomain, no npm package
+  (registry search for "faturapdf" returns 0 results), no GitHub organisation
+  (api.github.com/orgs/faturapdf 404), and the provider's own llms.txt, apis.json and
+  api-onboarding descriptor name no MCP surface. The catalog PROFILE.md recorded the same.
+pointer_note: >-
+  NO `type: MCPServer` pointer is wired into apis.yml for this file. The tools below are a
+  DERIVED candidate shape, not a server the provider runs — wiring the canonical pointer would
+  assert an MCP surface that does not exist and falsely credit the mcp_server checks. Emit the
+  pointer only if and when FaturaPDF publishes a real endpoint.
+server:
+  name: faturapdf
+  transport: null
+  url: null
+tools:
+  - name: generate_invoice
+    description: >-
+      Generate a Brazilian fatura (invoice) or recibo (receipt) PDF from issuer, customer and
+      line-item JSON. Returns raw application/pdf bytes.
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateInvoice
+    input_schema_source: '#/components/schemas/InvoiceRequest'
+    consequence: write
+  - name: generate_receipt
+    description: >-
+      Generate a Brazilian recibo (receipt) PDF — the same body as generate_invoice with tipo
+      forced to "recibo" (narrative "Recebemos de..." paragraph, amount in words, signature line).
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateReceipt
+    input_schema_source: '#/components/schemas/InvoiceRequest'
+    consequence: write
+  - name: health_check
+    description: Report whether the document service is up and which document types it can render.
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#healthCheck
+    input_schema_source: null
+    consequence: read
+notes:
+  binary_return: >-
+    An MCP implementation would have to return the PDF as a base64 blob resource — the REST
+    success body is binary, not JSON, which is the one non-trivial adaptation in this mapping.
+  auth: Every tool would carry the caller's own X-RapidAPI-Key; there is no OAuth surface to delegate.

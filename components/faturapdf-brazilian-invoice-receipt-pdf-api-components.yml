@@ -1,0 +1,73 @@
+generated: '2026-08-09'
+method: searched
+source: https://faturapdf.com/incorporar.html
+description: >-
+  Client-side embeddable widgets the provider publishes for third-party sites — iframe
+  components that run entirely in the visitor's browser and call no API. Distinct from
+  server-side SDKs (the provider ships none). Free, no signup, no key; the only condition
+  is a discreet credit link, which the provider says keeps the tools free.
+docs:
+  - https://faturapdf.com/incorporar.html
+libraries: []
+loader: >-
+  Plain <iframe> — there is no JS SDK to load. An optional 8-line postMessage listener
+  auto-resizes the frame; the widget posts {type: "alfa-embed-height", height: <px>} to the
+  parent window.
+families:
+  embeddable_tools:
+    description: >-
+      Standalone browser tools published for embedding in blogs, accounting sites, help
+      centres and CMS pages (WordPress, Wix, Blogger, Webflow, Squarespace, plain HTML).
+      All processing is local to the visitor's browser — PIX keys and tax documents are
+      never transmitted.
+    components:
+      - name: PIX generator (Copia e Cola + QR Code)
+        id: embed-pix
+        url: https://faturapdf.com/embed-pix.html
+        standalone_page: https://faturapdf.com/pix.html
+        embed: >-
+          <iframe src="https://faturapdf.com/embed-pix.html" width="100%" height="620"
+          loading="lazy" title="Gerador de PIX Copia e Cola e QR Code"></iframe>
+        description: >-
+          Visitor enters their own PIX key, amount and name; the widget builds the Banco
+          Central standard "copia e cola" BR Code and renders the QR.
+        recommended_height: 620
+      - name: CPF / CNPJ generator and validator
+        id: embed-cpf
+        url: https://faturapdf.com/embed-cpf.html
+        standalone_page: https://faturapdf.com/cpf-cnpj.html
+        embed: >-
+          <iframe src="https://faturapdf.com/embed-cpf.html" width="100%" height="560"
+          loading="lazy" title="Gerador e Validador de CPF e CNPJ"></iframe>
+        description: >-
+          Generates check-digit-valid synthetic CPF/CNPJ for system testing, and
+          validates/formats existing documents. Explicitly labelled test-only.
+        recommended_height: 560
+  hosted_surfaces:
+    description: Full-page hosted tools, linkable rather than embeddable.
+    components:
+      - name: Invoice / receipt PDF generator
+        url: https://faturapdf.com/gerador.html
+        description: >-
+          Browser build of the same validation and layout code the API runs — generates the
+          same fatura/recibo PDFs entirely client-side, no signup and no key.
+auto_resize_snippet: |
+  <script>
+  window.addEventListener("message", function (e) {
+    if (!e.data || e.data.type !== "alfa-embed-height") return;
+    document.querySelectorAll('iframe[src*="faturapdf.com/embed-"]').forEach(function (f) {
+      try { if (f.contentWindow === e.source) f.style.height = e.data.height + "px"; } catch (_) {}
+    });
+  });
+  </script>
+attribution:
+  required: true
+  note: >-
+    A discreet credit link ("por Gerador de PIX & API de faturas BR") ships inside the widget.
+    The provider offers a credit-free or customised build on request via the API contact.
+telemetry:
+  note: >-
+    The site keeps aggregate page-view counters, visible publicly at https://faturapdf.com/stats,
+    including per-embed counts (embed-pix, embed-cpf, embed-gerador) and the hostnames of external
+    sites embedding a widget. Counts and hostnames only — the provider states no cookies are set
+    and no personal data is collected.

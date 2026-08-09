@@ -1,0 +1,136 @@
+{
+  "aid": "com.faturapdf",
+  "name": "FaturaPDF — Brazilian Invoice & Receipt PDF API",
+  "type": "Index",
+  "description": "Machine-readable index for FaturaPDF, an HTTP API that turns a JSON payload into a Brazilian invoice (fatura) or receipt (recibo) PDF with native fiscal formatting: checksum-validated CPF/CNPJ, BRL currency (R$ 1.234,56), DD/MM/AAAA dates, the amount spelled out in Portuguese, and an optional PIX QR code rendered from a BR Code the caller supplies. Rendered with a pure-JS PDF engine (pdf-lib), no headless browser. This is NOT an NF-e/NFS-e issuer: it produces a formatted commercial document, not a tax-authority-authorized fiscal record.",
+  "image": "https://faturapdf.com/og-cover.png",
+  "url": "https://faturapdf.com/apis.json",
+  "specificationVersion": "0.16",
+  "created": "2026-07-25",
+  "modified": "2026-08-07",
+  "tags": [
+    "Invoices",
+    "Receipts",
+    "PDF",
+    "Documents",
+    "Brazil",
+    "Billing",
+    "CPF",
+    "CNPJ",
+    "PIX",
+    "Fintech"
+  ],
+  "apis": [
+    {
+      "aid": "com.faturapdf.invoice",
+      "name": "Brazilian Invoice & Receipt PDF API",
+      "description": "POST an issuer, a customer and line items as JSON; receive the bytes of a ready-to-send PDF. Two endpoints: POST /invoice (fatura or recibo, selected by the `tipo` field) and POST /receipt (forces recibo). CPF and CNPJ are validated with the real Brazilian mod-11 check-digit algorithm and rejected with HTTP 400 if wrong, rather than printed. Totals are computed server-side in integer cents, so no floating-point artefact reaches the document. Multi-page pagination with a repeating table header is automatic. Free tier: 20 documents/month, no credit card.",
+      "image": "https://faturapdf.com/og-cover.png",
+      "humanURL": "https://faturapdf.com/",
+      "baseURL": "https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com",
+      "tags": [
+        "Invoices",
+        "Receipts",
+        "PDF Generation",
+        "Documents",
+        "Brazil",
+        "Billing",
+        "CPF Validation",
+        "CNPJ Validation",
+        "PIX",
+        "Fintech",
+        "Data Validation"
+      ],
+      "properties": [
+        {
+          "type": "OpenAPI",
+          "url": "https://faturapdf.com/openapi.yaml"
+        },
+        {
+          "type": "Documentation",
+          "url": "https://faturapdf.com/guides/"
+        },
+        {
+          "type": "Pricing",
+          "url": "https://faturapdf.com/#pricing"
+        },
+        {
+          "type": "x-apis-json",
+          "url": "https://faturapdf.com/apis.json"
+        },
+        {
+          "type": "x-api-onboarding",
+          "url": "https://faturapdf.com/.well-known/api-onboarding"
+        },
+        {
+          "type": "Privacy",
+          "url": "https://faturapdf.com/terms/#what-happens-to-the-data-you-send"
+        },
+        {
+          "type": "Security",
+          "url": "https://faturapdf.com/.well-known/security.txt"
+        },
+        {
+          "type": "TermsOfService",
+          "url": "https://faturapdf.com/terms/"
+        },
+        {
+          "type": "SignUp",
+          "url": "https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj"
+        },
+        {
+          "type": "StatusPage",
+          "url": "https://faturapdf.com/health"
+        },
+        {
+          "type": "x-llms-txt",
+          "url": "https://faturapdf.com/llms.txt"
+        },
+        {
+          "type": "x-sample-output",
+          "url": "https://faturapdf.com/samples/fatura-exemplo.pdf"
+        },
+        {
+          "type": "x-free-tool",
+          "url": "https://faturapdf.com/gerador.html"
+        },
+        {
+          "type": "x-guide-nodejs",
+          "url": "https://faturapdf.com/guides/generate-invoice-pdf-nodejs/"
+        },
+        {
+          "type": "x-guide-python",
+          "url": "https://faturapdf.com/guides/generate-invoice-pdf-python/"
+        },
+        {
+          "type": "x-reference-cpf-cnpj",
+          "url": "https://faturapdf.com/guides/cpf-cnpj-check-digit-algorithm/"
+        },
+        {
+          "type": "x-reference-pix",
+          "url": "https://faturapdf.com/guides/pix-br-code-format/"
+        },
+        {
+          "type": "x-authentication",
+          "url": "https://faturapdf.com/openapi.yaml"
+        },
+        {
+          "type": "x-scope-disclaimer",
+          "url": "https://faturapdf.com/guides/brazilian-fiscal-documents/"
+        }
+      ],
+      "contact": [
+        {
+          "FN": "FaturaPDF",
+          "url": "https://faturapdf.com/"
+        }
+      ]
+    }
+  ],
+  "maintainers": [
+    {
+      "FN": "FaturaPDF",
+      "url": "https://faturapdf.com/"
+    }
+  ]
+}

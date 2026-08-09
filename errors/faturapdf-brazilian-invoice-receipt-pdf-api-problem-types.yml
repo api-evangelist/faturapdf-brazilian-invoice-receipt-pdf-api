@@ -1,0 +1,102 @@
+generated: '2026-08-09'
+method: searched
+source: >-
+  https://faturapdf.com/guides/generate-invoice-pdf-nodejs/ (the published
+  status/error-code table) enriched with the 4xx/5xx responses declared in
+  openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml.
+format: custom-error-envelope
+envelope:
+  media_type: application/json
+  schema: '#/components/schemas/ErrorResponse'
+  fields:
+    error: Short, stable machine-readable code. Branch retry/handling logic on this.
+    message: >-
+      Human-readable message, PT-BR. Never contains a stack trace or internal detail.
+      On invalid_params it lists every validation failure at once, semicolon-separated.
+  note: >-
+    Not RFC 9457. There is no type URI, no title/detail/instance, and the media type is
+    application/json rather than application/problem+json.
+binary_vs_json_hazard: >-
+  A success is raw PDF bytes (200 application/pdf); a failure is JSON. The provider
+  documents this trap explicitly — branch on the status code (or Content-Type) BEFORE
+  reading the body, or a valid PDF gets destroyed by text decoding and the real error
+  message is thrown away.
+problems:
+  - status: 400
+    code: invalid_json
+    title: Malformed request body
+    detail: Body was not parseable JSON — usually a serialization bug on the caller's side.
+    retryable: false
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateInvoice
+  - status: 400
+    code: invalid_params
+    title: Validation failed
+    detail: >-
+      A required field is missing, a field exceeds its maximum length, or a CPF/CNPJ
+      failed its mod-11 check digit. All failures are reported in one message rather
+      than one round-trip at a time.
+    example_message: >-
+      emitente.documento "111.111.111-11" tem formato de CPF mas digito verificador invalido
+    remediation: >-
+      Validate CPF/CNPJ locally before spending a call (the mod-11 algorithm is published at
+      https://faturapdf.com/guides/cpf-cnpj-check-digit-algorithm/). Never retry — a retry
+      just burns quota.
+    retryable: false
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateInvoice
+  - status: 401
+    code: unauthorized
+    title: Not authenticated through the RapidAPI gateway
+    detail: >-
+      Missing or invalid X-RapidAPI-Key, or the request went straight to the origin host
+      faturapdf.com instead of the gateway. The gateway answers {"message":"Invalid API
+      key..."}; the origin answers {"error":"unauthorized"}.
+    remediation: >-
+      Address https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com and send
+      your subscriber X-RapidAPI-Key (X-RapidAPI-Host recommended).
+    retryable: false
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateInvoice
+  - status: 405
+    code: method_not_allowed
+    title: Wrong HTTP method
+    detail: /invoice and /receipt are POST-only; a GET returns 405.
+    retryable: false
+    source_docs: https://faturapdf.com/guides/generate-invoice-pdf-nodejs/
+  - status: 413
+    code: payload_too_large
+    title: Request body over the limit
+    detail: Body above ~200 KB of JSON, or more than 200 line items — whichever comes first.
+    remediation: Split the document, or reduce itens[] to 200 or fewer entries.
+    retryable: false
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateInvoice
+  - status: 429
+    code: null
+    title: Plan quota exhausted
+    detail: >-
+      Applied by the RapidAPI gateway before the request reaches the API, not by the API
+      itself. Monthly document quota for the subscribed plan is spent.
+    remediation: >-
+      Wait for the monthly reset or upgrade the plan on RapidAPI. In a batch job, treat
+      429 as fatal for the run rather than retrying.
+    retryable: conditional
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateInvoice
+  - status: 500
+    code: render_failed
+    title: Internal render failure
+    detail: PDF rendering failed. Message is sanitized — never a stack trace.
+    retryable: true
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateInvoice
+  - status: 504
+    code: render_timeout
+    title: Render exceeded the internal time limit
+    detail: Generation exceeded the internal 8 second limit.
+    retryable: true
+    source_operation: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml#generateInvoice
+retry_policy:
+  retryable_statuses: [408, 429, 500, 502, 503, 504]
+  strategy: >-
+    Exponential backoff with jitter (published reference implementation: 400ms, 800ms,
+    1600ms, +/-30%, 3 attempts).
+  safety: >-
+    Retries cannot duplicate a document — generation is stateless and nothing is stored
+    server-side. See conventions/faturapdf-brazilian-invoice-receipt-pdf-api-conventions.yml.
+  docs: https://faturapdf.com/guides/generate-invoice-pdf-nodejs/

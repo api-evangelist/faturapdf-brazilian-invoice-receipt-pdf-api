@@ -1,0 +1,80 @@
+generated: '2026-08-09'
+method: searched
+description: >-
+  Results of probing the /.well-known/ discovery surface on every host in apis.yml
+  (baseURL) and the OpenAPI servers[] block, plus the origin/docs host. Status is
+  the HTTP code observed at fetch time on 2026-08-09. faturapdf.com returns a real
+  404 (text/html, 3,449 bytes) for missing paths — it is not an SPA catch-all — so
+  the 404s below are genuine absences rather than soft-404s. The RapidAPI gateway
+  host answers 401 at the root without a subscriber key and 429 on every other path
+  probed anonymously, so nothing under /.well-known/ could be read there.
+hosts:
+  - host: https://faturapdf.com
+    role: origin / docs / spec host
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        type: text/plain
+        file: faturapdf-brazilian-invoice-receipt-pdf-api-security.txt
+      - path: /.well-known/api-onboarding
+        status: 200
+        type: application/json (served as text/plain)
+        file: faturapdf-brazilian-invoice-receipt-pdf-api-api-onboarding.json
+        note: >-
+          API onboarding descriptor (aod 0.1) — the provider's machine-readable
+          account/registration/credential bootstrap document.
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/mcp.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com
+    role: RapidAPI gateway (the only publicly callable base URL)
+    documents:
+      - path: /
+        status: 401
+        note: '{"message":"Invalid API key..."} — gateway rejects unsubscribed callers.'
+      - path: /.well-known/security.txt
+        status: 429
+      - path: /.well-known/openid-configuration
+        status: 429
+      - path: /.well-known/api-catalog
+        status: 429
+      - path: /.well-known/agent-card.json
+        status: 429
+      - path: /.well-known/agent.json
+        status: 429
+other_discovery_documents:
+  - path: /apis.json
+    host: https://faturapdf.com
+    status: 200
+    file: faturapdf-brazilian-invoice-receipt-pdf-api-apis.json
+    note: >-
+      Provider-published APIs.json 0.16 index (aid com.faturapdf) — not a
+      /.well-known/ path but the same discovery layer, saved verbatim here.
+  - path: /llms.txt
+    host: https://faturapdf.com
+    status: 200
+    file: ../llms/faturapdf-brazilian-invoice-receipt-pdf-api-llms.txt
+  - path: /openapi.yaml
+    host: https://faturapdf.com
+    status: 200
+    file: ../openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
+  - path: /sitemap.xml
+    host: https://faturapdf.com
+    status: 200
+  - path: /robots.txt
+    host: https://faturapdf.com
+    status: 200
+    note: 'User-agent: * / Allow: / — no agent or crawler is disallowed.'

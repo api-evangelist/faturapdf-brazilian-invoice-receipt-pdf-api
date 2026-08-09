@@ -1,0 +1,96 @@
+generated: '2026-08-09'
+method: derived
+source: >-
+  Derived from components.schemas and the request/response bodies in
+  openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml, enriched with the
+  field reference published at https://faturapdf.com/guides/generate-invoice-pdf-nodejs/.
+docs: https://faturapdf.com/guides/generate-invoice-pdf-nodejs/
+notation: >-
+  relationships use has_one / has_many / belongs_to with the field name that carries the
+  reference; direction is from the entity that owns the field. This API is stateless — there
+  are no persisted resources and no identifiers issued by the server, so every entity below is
+  a request-document structure, not a stored object. Nothing has an id_prefix because nothing
+  is retrievable after the response.
+persistence: none — no resource is stored, addressable or retrievable after generation
+
+entities:
+  - name: InvoiceRequest
+    schema: '#/components/schemas/InvoiceRequest'
+    domain: documents
+    description: >-
+      The whole input document. `tipo` selects the rendered layout: fatura (itemized table +
+      highlighted total) or recibo (narrative "Recebemos de..." + signature line).
+    required: [emitente, destinatario, itens]
+    fields:
+      - {name: tipo, type: string, enum: [fatura, recibo], default: fatura}
+      - {name: numero, type: string, max: 60, note: caller's own document number, free text}
+      - {name: data, type: string, note: 'AAAA-MM-DD or DD/MM/AAAA; omitted = server date today'}
+      - {name: vencimento, type: string, note: due date, only meaningful when tipo=fatura}
+      - {name: desconto, type: number, min: 0, default: 0, note: flat discount, total never goes negative}
+      - {name: forma_pagamento, type: string, max: 100}
+      - {name: observacoes, type: string, max: 2000}
+      - {name: pix_copia_cola, type: string, max: 600, note: EMV BR Code supplied by the caller; rendered as a QR, never minted}
+      - {name: mostrar_valor_por_extenso, type: boolean, default: false, note: automatic on recibo, opt-in on fatura}
+  - name: Party
+    schema: '#/components/schemas/Party'
+    domain: documents
+    description: >-
+      A person or company on the document. Used twice — as `emitente` (issuer) and as
+      `destinatario` (customer). `documento` is required on the issuer, optional on the customer,
+      and validated by mod-11 check digit in both positions when present.
+    required: [nome]
+    fields:
+      - {name: nome, type: string, max: 200}
+      - {name: documento, type: string, note: 'CPF (11 digits) or CNPJ (14 digits), masked or unmasked; check-digit validated'}
+      - {name: endereco, type: string, max: 300}
+      - {name: email, type: string, max: 200}
+      - {name: telefone, type: string, max: 40}
+  - name: InvoiceItem
+    schema: '#/components/schemas/InvoiceItem'
+    domain: documents
+    description: One line on the document. Between 1 and 200 per request.
+    required: [descricao, valor_unitario]
+    fields:
+      - {name: descricao, type: string, max: 200}
+      - {name: quantidade, type: number, default: 1, note: exclusive minimum 0}
+      - {name: valor_unitario, type: number, min: 0, note: unit price in reais (349.90), not cents}
+  - name: ErrorResponse
+    schema: '#/components/schemas/ErrorResponse'
+    domain: platform
+    description: The failure envelope returned on every non-2xx response.
+    required: [error, message]
+    fields:
+      - {name: error, type: string, note: short stable code — branch logic on this}
+      - {name: message, type: string, note: human-readable PT-BR, never a stack trace}
+  - name: PdfDocument
+    schema: 'binary (application/pdf)'
+    domain: documents
+    description: >-
+      The 200 response body — raw PDF bytes, typically ~9 KB for a one-page invoice. Not a
+      resource: it is never stored, has no URL, and cannot be re-fetched. The caller owns
+      retention.
+  - name: HealthStatus
+    schema: 'inline object on GET /health'
+    domain: platform
+    description: Liveness document.
+    fields:
+      - {name: ok, type: boolean}
+      - {name: service, type: string}
+      - {name: tipos, type: array, note: 'document types the service can render — ["fatura","recibo"]'}
+
+relationships:
+  - {from: InvoiceRequest, to: Party, kind: has_one, via: emitente, required: true, note: documento is required here}
+  - {from: InvoiceRequest, to: Party, kind: has_one, via: destinatario, required: true, note: documento is optional here}
+  - {from: InvoiceRequest, to: InvoiceItem, kind: has_many, via: itens, min: 1, max: 200}
+  - {from: InvoiceRequest, to: PdfDocument, kind: produces, via: 'POST /invoice | POST /receipt', note: synchronous, no intermediate resource}
+  - {from: InvoiceRequest, to: ErrorResponse, kind: produces, via: any non-2xx status}
+
+computed_fields:
+  note: >-
+    Never sent by the client — the API computes them in integer cents so no floating-point
+    artefact reaches the document.
+  fields: [subtotalItem, subtotal, total]
+
+operations_by_entity:
+  InvoiceRequest: [generateInvoice, generateReceipt]
+  HealthStatus: [healthCheck]

@@ -1,11 +1,18 @@
 name: FaturaPDF — Brazilian Invoice & Receipt PDF API
 description: >-
   HTTP API that converts a JSON payload into a Brazilian invoice (fatura) or receipt (recibo) PDF. Fiscal-native
-  features include mod-11 checksum-validated CPF/CNPJ, BRL formatting, Portuguese amount spelling, and optional PIX QR
-  rendering. Not an NF-e/NFS-e fiscal issuer. Metered and billed via RapidAPI with a free tier.
+  features include mod-11 checksum-validated CPF/CNPJ, BRL formatting (R$ 1.234,56 computed in integer cents),
+  DD/MM/AAAA dates, the total spelled out in Portuguese, and optional rendering of a caller-supplied PIX BR Code as a
+  scannable QR. Rendered with a pure-JS engine (pdf-lib), no headless browser. Explicitly NOT an NF-e/NFS-e fiscal
+  issuer — it produces a formatted commercial document, not a tax-authority-authorized record. Consumed through the
+  RapidAPI gateway (the origin host is not directly callable) and metered per document, with a free tier of 20
+  documents a month and no credit card. The provider also publishes free, keyless, client-side tools: an
+  invoice/receipt generator, a CPF/CNPJ generator-validator and a PIX BR Code builder, two of them embeddable as
+  iframes.
+image: https://faturapdf.com/og-cover.png
 url: https://faturapdf-brazilian-invoice-receipt-pdf-api.apievangelist.com/apis.yml
 created: '2026-08-07'
-modified: '2026-08-07'
+modified: '2026-08-09'
 specificationVersion: '0.21'
 tags:
   - Invoices
@@ -42,6 +49,8 @@ apis:
     properties:
       - type: OpenAPI
         url: https://faturapdf.com/openapi.yaml
+      - type: OpenAPI
+        url: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
       - type: LLMSTxt
         url: https://faturapdf.com/llms.txt
       - type: Documentation
@@ -49,8 +58,79 @@ apis:
 maintainers:
   - FN: FaturaPDF — Brazilian Invoice & Receipt PDF API
     url: https://faturapdf.com/
+    email: leo.sanchees2014+arenaalfa@gmail.com
 generated:
   by: apis.io/add
   model: claude-opus-4-8
   confidence: 95
   at: '2026-08-07T01:32:03.766Z'
+common:
+- type: DeveloperPortal
+  url: https://faturapdf.com/
+- type: Documentation
+  url: https://faturapdf.com/guides/
+- type: APIReference
+  url: https://faturapdf.com/openapi.yaml
+- type: GettingStarted
+  url: https://faturapdf.com/guides/generate-invoice-pdf-nodejs/
+- type: Support
+  url: https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj
+- type: Pricing
+  url: https://faturapdf.com/#pricing
+- type: SignUp
+  url: https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj
+- type: TermsOfService
+  url: https://faturapdf.com/terms/
+- type: PrivacyPolicy
+  url: https://faturapdf.com/terms/#what-happens-to-the-data-you-send
+- type: StatusPage
+  url: https://faturapdf.com/health
+- type: Security
+  url: https://faturapdf.com/.well-known/security.txt
+- type: OpenAPI
+  url: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
+- type: LLMsTxt
+  url: llms/faturapdf-brazilian-invoice-receipt-pdf-api-llms.txt
+- type: WellKnown
+  url: well-known/faturapdf-brazilian-invoice-receipt-pdf-api-well-known.yml
+- type: SecurityTxt
+  url: well-known/faturapdf-brazilian-invoice-receipt-pdf-api-security.txt
+- type: AgenticAccess
+  url: agentic-access/faturapdf-brazilian-invoice-receipt-pdf-api-agentic-access.yml
+- type: VulnerabilityDisclosure
+  url: security/faturapdf-brazilian-invoice-receipt-pdf-api-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/faturapdf-brazilian-invoice-receipt-pdf-api-domain-security.yml
+- type: Authentication
+  url: authentication/faturapdf-brazilian-invoice-receipt-pdf-api-authentication.yml
+- type: Conventions
+  url: conventions/faturapdf-brazilian-invoice-receipt-pdf-api-conventions.yml
+- type: Idempotency
+  url: conventions/faturapdf-brazilian-invoice-receipt-pdf-api-conventions.yml
+- type: ErrorCatalog
+  url: errors/faturapdf-brazilian-invoice-receipt-pdf-api-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/faturapdf-brazilian-invoice-receipt-pdf-api-lifecycle.yml
+- type: Conformance
+  url: conformance/faturapdf-brazilian-invoice-receipt-pdf-api-conformance.yml
+- type: Sandbox
+  url: sandbox/faturapdf-brazilian-invoice-receipt-pdf-api-sandbox.yml
+- type: Components
+  url: components/faturapdf-brazilian-invoice-receipt-pdf-api-components.yml
+- type: DataModel
+  url: data-model/faturapdf-brazilian-invoice-receipt-pdf-api-data-model.yml
+- type: Overlay
+  url: overlays/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-overlay.yaml
+- type: Examples
+  url: examples/faturapdf-brazilian-invoice-receipt-pdf-api-generate-invoice-example.json
+- type: Plans
+  url: plans/faturapdf-brazilian-invoice-receipt-pdf-api-plans.yml
+- type: RateLimits
+  url: rate-limits/faturapdf-brazilian-invoice-receipt-pdf-api-rate-limits.yml
+- type: AgentSkill
+  url: skills/_index.yml
+x-enrichment:
+  date: '2026-08-09'
+  status: enriched
+  artifacts_added: 28
+  pass: local-v1

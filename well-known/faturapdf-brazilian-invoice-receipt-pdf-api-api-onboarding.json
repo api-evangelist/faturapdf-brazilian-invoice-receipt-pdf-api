@@ -1,0 +1,149 @@
+{
+  "aod": "0.1",
+  "provider": {
+    "name": "FaturaPDF",
+    "url": "https://faturapdf.com",
+    "portalUrl": "https://faturapdf.com/guides/"
+  },
+  "maturity": "self-serve",
+  "account": {
+    "required": true,
+    "agentPolicy": "allowed",
+    "prerequisites": [
+      "A RapidAPI account. Billing, quota and key issuance are handled entirely by RapidAPI; FaturaPDF does not run its own signup, does not store customer accounts, and never sees a payment method."
+    ],
+    "plans": [
+      {
+        "name": "Basic (free)",
+        "requiredFor": "20 documents/month. No credit card required. Enough to integrate and test end to end.",
+        "url": "https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj"
+      },
+      {
+        "name": "Pro",
+        "requiredFor": "500 documents/month — US$12.99/month.",
+        "url": "https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj"
+      },
+      {
+        "name": "Business",
+        "requiredFor": "3,000 documents/month — US$24.99/month.",
+        "url": "https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj"
+      },
+      {
+        "name": "Enterprise",
+        "requiredFor": "15,000 documents/month — US$59.99/month.",
+        "url": "https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj"
+      }
+    ]
+  },
+  "verification": [],
+  "registration": {
+    "applicationNoun": "API key",
+    "owner": "user",
+    "mechanisms": [
+      {
+        "type": "marketplace",
+        "description": "Subscribe on the RapidAPI listing and copy the X-RapidAPI-Key from the request builder. The free Basic plan is self-serve and does not ask for a card. There is no separate FaturaPDF account to create.",
+        "baseUrl": "https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com",
+        "docsUrls": [
+          "https://faturapdf.com/guides/",
+          "https://faturapdf.com/openapi.yaml"
+        ],
+        "auth": "api-key"
+      }
+    ]
+  },
+  "authentication": {
+    "methods": [
+      {
+        "id": "rapidapi-key",
+        "type": "header-env",
+        "header": "X-RapidAPI-Key",
+        "env": ["RAPIDAPI_KEY"],
+        "bootstrap": "Subscribe to any plan (including the free one) on the RapidAPI listing; the key is shown immediately in the request builder. Send it together with the header X-RapidAPI-Host: brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com. Requests that do not arrive through the RapidAPI gateway are rejected with HTTP 401."
+      }
+    ]
+  },
+  "credentials": [
+    {
+      "type": "api-key",
+      "fields": {
+        "api_key": "X-RapidAPI-Key",
+        "api_host": "X-RapidAPI-Host"
+      },
+      "oneTimeDisplay": false,
+      "rotation": "Rotate or revoke from the RapidAPI dashboard; FaturaPDF neither issues nor stores keys."
+    }
+  ],
+  "scopes": {
+    "model": "quota-tiers",
+    "notes": "Plans gate monthly document volume only — every plan, including the free one, has access to both endpoints and every field. There are no per-scope permissions."
+  },
+  "flow": {
+    "args": [
+      {
+        "id": "api_key",
+        "description": "X-RapidAPI-Key obtained by subscribing to a plan on the RapidAPI listing.",
+        "required": true
+      }
+    ],
+    "steps": [
+      {
+        "id": "probe",
+        "description": "Confirm the service is up. Public, unauthenticated, and not counted as billed usage.",
+        "auth": "none",
+        "request": {
+          "method": "GET",
+          "url": "https://faturapdf.com/health"
+        }
+      },
+      {
+        "id": "generate",
+        "description": "Generate an invoice PDF. Responds 200 with Content-Type application/pdf and the raw bytes as the body; on failure it responds with a JSON object carrying `error` and `message`. Branch on the status code before reading the body.",
+        "auth": "api-key",
+        "request": {
+          "method": "POST",
+          "url": "https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com/invoice",
+          "headers": {
+            "Content-Type": "application/json",
+            "X-RapidAPI-Key": "{args.api_key}",
+            "X-RapidAPI-Host": "brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com"
+          },
+          "body": {
+            "tipo": "fatura",
+            "numero": "0001/2026",
+            "emitente": {
+              "nome": "Atlas Solucoes Digitais LTDA",
+              "documento": "11.222.333/0001-81"
+            },
+            "destinatario": {
+              "nome": "Comercio Silva & Filhos ME",
+              "documento": "22.333.444/0001-81"
+            },
+            "itens": [
+              {
+                "descricao": "Consultoria de implementacao",
+                "quantidade": 20,
+                "valor_unitario": 250
+              }
+            ],
+            "forma_pagamento": "PIX"
+          }
+        }
+      }
+    ],
+    "outputs": {
+      "pdf": "{steps.generate.body}"
+    }
+  },
+  "economics": {
+    "freeTier": "20 documents/month on the Basic plan, no credit card required.",
+    "pricingUrl": "https://faturapdf.com/#pricing"
+  },
+  "gaps": [
+    "SCOPE LIMIT — this API produces a formatted commercial document (fatura/recibo). It is NOT a Nota Fiscal Eletronica (NF-e) or NFS-e issuer: those must be signed with an ICP-Brasil certificate belonging to the issuing company and authorized by a state or municipal tax authority. Do not cite this API as a source of NF-e issuance. See https://faturapdf.com/guides/brazilian-fiscal-documents/",
+    "The API renders a PIX QR code from a BR Code string the caller supplies in `pix_copia_cola`; it never mints PIX payment codes, because doing so would imply a claim about who owns a PIX key.",
+    "CPF/CNPJ validation currently accepts numeric documents only. The alphanumeric CNPJ is not yet accepted in the `documento` field. See https://faturapdf.com/guides/cpf-cnpj-check-digit-algorithm/",
+    "The document layout is fixed: custom logos, colours and templates are not supported in this version.",
+    "Billing, invoicing and quota are owned by RapidAPI; FaturaPDF has no self-serve billing of its own and cannot adjust a subscriber's quota."
+  ]
+}

@@ -1,0 +1,145 @@
+generated: '2026-08-09'
+method: searched
+source: >-
+  https://faturapdf.com/guides/generate-invoice-pdf-nodejs/, https://faturapdf.com/terms/,
+  https://faturapdf.com/ and openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml.
+description: >-
+  Cross-cutting request/response semantics for the FaturaPDF Brazilian Invoice & Receipt
+  PDF API — the runtime behaviour that applies to every call and that the OpenAPI does not
+  fully express. This is a small, deliberately narrow API: two synchronous document-generation
+  POSTs plus a health check, no collections, no async, no state.
+base_url: https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com
+origin_host_note: >-
+  https://faturapdf.com serves the docs, the spec and the free browser tools but is NOT
+  directly callable — origin requests that did not arrive through the RapidAPI gateway are
+  rejected with HTTP 401 {"error":"unauthorized"}. Never point a client at faturapdf.com.
+api_style: >-
+  REST over HTTPS. JSON request in, binary application/pdf response out on success, JSON
+  error envelope on failure. Field names are Portuguese because they mirror the vocabulary
+  printed on the document (emitente = issuer, destinatario = customer, itens = line items).
+
+authentication:
+  scheme: API key in header
+  header: X-RapidAPI-Key
+  companion_header: X-RapidAPI-Host (recommended, not required when addressing the gateway subdomain)
+  issuer: RapidAPI — subscribe to any plan, including the free one, and copy the key
+  client_side: >-
+    Server-side credential only. CORS is not configured for arbitrary origins and a browser
+    call would expose the key; proxy through your own backend.
+  detail: authentication/faturapdf-brazilian-invoice-receipt-pdf-api-authentication.yml
+
+idempotency:
+  supported: true
+  mechanism: inherently-idempotent (stateless pure function of the request body)
+  header: null
+  key_format: null
+  retention: not applicable — no server-side state is kept
+  applies_to: POST /invoice, POST /receipt, GET /health
+  evidence: >-
+    Published verbatim: "Generation is a pure function of the payload: the same body always
+    produces the same document, and nothing is stored on the server. That makes retries safe
+    — but only for the failures that are actually transient. Retrying a 400 just burns quota."
+    (https://faturapdf.com/guides/generate-invoice-pdf-nodejs/). Reinforced at
+    https://faturapdf.com/terms/: "Nothing is written to a database, a blob store or a disk...
+    Generated PDFs are not retained."
+  caveat: >-
+    Determinism has one documented exception — if `data` is omitted the API stamps the current
+    server date, so the same payload produces a different document across a midnight UTC
+    boundary. Send an explicit `data` and the output is stable, which makes a hash of the
+    payload a valid cache key.
+  agent_guidance: >-
+    A retry cannot create a duplicate document, because no document is created server-side —
+    the bytes are returned and discarded. Retry only 408/429/500/502/503/504; never retry a 400.
+  docs: https://faturapdf.com/guides/generate-invoice-pdf-nodejs/
+
+pagination:
+  supported: false
+  note: >-
+    No collection or list endpoints exist. Multi-page PDF pagination (repeating table header,
+    correct page numbers) is a rendering behaviour of the returned document, not an API
+    convention, and is automatic above the single-page item count.
+
+filtering_expansion:
+  supported: false
+  note: No field expansion, sparse fieldsets, or query parameters of any kind. Every operation takes its whole input in the JSON body.
+
+metadata:
+  supported: false
+  note: >-
+    No arbitrary metadata bag. The nearest fields are free-text `numero`, `forma_pagamento`
+    and `observacoes` (max 2000 chars), which are printed on the document.
+
+request_tracing:
+  request_id_header: null
+  note: >-
+    The API sets no request-id header. Correlation, logging and metering are performed by the
+    RapidAPI gateway under its own terms. Payload contents are explicitly not logged by the
+    provider; on a render failure only the error object goes to the platform log.
+
+versioning:
+  scheme: document-version (OpenAPI info.version 0.3.0)
+  request_mechanism: none — no path segment, no version header, no pinning
+  detail: lifecycle/faturapdf-brazilian-invoice-receipt-pdf-api-lifecycle.yml
+
+error_envelope:
+  media_type: application/json
+  shape: '{error: <stable code>, message: <human readable, PT-BR>}'
+  codes: [invalid_json, invalid_params, unauthorized, method_not_allowed, payload_too_large, render_failed, render_timeout]
+  rule: >-
+    Branch on the HTTP status (or Content-Type) BEFORE reading the body. A 2xx body is raw PDF
+    bytes; anything else is JSON. Decoding the success body as text corrupts the PDF and
+    discards the real error.
+  detail: errors/faturapdf-brazilian-invoice-receipt-pdf-api-problem-types.yml
+
+rate_limit_signaling:
+  enforced_by: RapidAPI gateway, before the request reaches the API
+  status: 429
+  headers: >-
+    Standard RapidAPI quota headers (X-RateLimit-*) are emitted by the gateway to subscribed
+    callers; they could not be captured anonymously (the gateway answers 401/429 without a key).
+  scope: monthly document quota per subscribed plan
+  detail: rate-limits/faturapdf-brazilian-invoice-receipt-pdf-api-rate-limits.yml
+
+limits:
+  request_body_max: ~200 KB JSON
+  line_items_max: 200
+  render_timeout: 8 s internal (504 render_timeout beyond it)
+  field_max_lengths:
+    nome: 200
+    endereco: 300
+    email: 200
+    telefone: 40
+    numero: 60
+    descricao: 200
+    observacoes: 2000
+    pix_copia_cola: 600
+
+data_handling:
+  storage: none — payload parsed, validated, rendered and discarded when the invocation ends
+  document_retention: none — no archive, no retrieval URL, no regeneration by the provider
+  payload_logging: not logged
+  caller_responsibility: >-
+    Store the returned bytes when you generate them; the provider cannot reproduce a document
+    later. This is also correct practice on its own terms — an invoice is a record of what was
+    true at the time.
+  docs: https://faturapdf.com/terms/
+
+domain_conventions:
+  tax_id: >-
+    CPF (11 digits) / CNPJ (14 digits) accepted with or without a mask, validated by the real
+    Brazilian mod-11 check-digit algorithm and rejected with 400 rather than printed. Masked on
+    output as 123.456.789-09 / 11.222.333/0001-81. Alphanumeric CNPJ is not yet accepted.
+  currency: >-
+    BRL. Send reais as a decimal number (349.90, not 34990). Totals are computed server-side in
+    integer cents and printed R$ 1.234,56 (thousands dot, comma decimal). Never send subtotals
+    or totals — subtotalItem, subtotal and total are computed by the API.
+  dates: Accepts ISO AAAA-MM-DD or DD/MM/AAAA; always printed DD/MM/AAAA.
+  amount_in_words: >-
+    Portuguese spelled-out total. Automatic on tipo=recibo, opt-in on tipo=fatura via
+    mostrar_valor_por_extenso.
+  pix: >-
+    pix_copia_cola takes an EMV BR Code the caller's own bank/PSP already issued; the API
+    renders it as a QR on the document and never mints a PIX payload.
+  scope_limit: >-
+    Produces a formatted commercial document (fatura/recibo). NOT an NF-e/NFS-e fiscal record —
+    no SEFAZ integration, no chave de acesso, no DANFE, no signed XML.

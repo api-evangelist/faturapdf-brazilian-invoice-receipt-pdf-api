@@ -1,0 +1,396 @@
+openapi: 3.0.3
+info:
+  title: Brazilian Invoice & Receipt PDF API
+  description: >-
+    Generates a professional invoice ("fatura") or receipt ("recibo") PDF
+    from a JSON payload. Native Brazilian fiscal fields: CPF/CNPJ (masked
+    and checksum-validated), BRL currency formatting, DD/MM/YYYY dates,
+    PT-BR labels. Rendered with a pure-JS PDF engine (no headless browser),
+    so it's fast and deterministic.
+
+
+    ## NOT an NF-e / NFS-e issuer
+
+
+    This API produces a **formatted commercial document** (fatura/recibo) — it
+    is **NOT** a tax-authority-authorized fiscal record. It does not talk to
+    SEFAZ or to any municipal NFS-e system, does not issue or cancel NF-e /
+    NFC-e / NFS-e, does not produce a chave de acesso, protocolo de
+    autorização, DANFE or XML assinado. If you legally need a nota fiscal,
+    use an authorized issuer. Use this API for the commercial paperwork
+    around the sale (billing document, receipt, payment request).
+
+
+    ## How to call it (the real contract)
+
+
+    The API is distributed **through the RapidAPI gateway**. Send your
+    requests to `https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com`
+    with your personal `X-RapidAPI-Key` header (see `securitySchemes`).
+    RapidAPI's own code snippets also send `X-RapidAPI-Host`; that header is
+    accepted and recommended, but not required when you address the gateway
+    subdomain directly.
+
+
+    The origin host `https://faturapdf.com` hosts the docs, the free web
+    tools and this specification, but it is **not directly callable**: origin
+    requests that did not come through the gateway are rejected with HTTP 401
+    (`{"error":"unauthorized"}`). Do not point a client at `faturapdf.com`.
+
+
+    Free tier: 20 documents/month, no credit card.
+  version: "0.3.0"
+  termsOfService: https://faturapdf.com/terms/
+  contact:
+    name: FaturaPDF Support
+    url: https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj
+  license:
+    name: Proprietary
+
+externalDocs:
+  description: Guides, code samples and free web tools
+  url: https://faturapdf.com/
+
+servers:
+  # Public gateway — this is the host consumers actually call. Auth is the
+  # consumer's own X-RapidAPI-Key (see components.securitySchemes).
+  - url: https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com
+    description: RapidAPI gateway (the only publicly callable base URL)
+
+tags:
+  - name: documents
+    description: Geração de fatura/recibo em PDF
+
+paths:
+  /invoice:
+    post:
+      operationId: generateInvoice
+      tags: [documents]
+      summary: Gera um PDF de fatura ou recibo
+      description: >-
+        Recebe emitente, destinatário, itens e metadados via JSON e devolve
+        os bytes do PDF pronto. `tipo` controla o layout: "fatura" (default,
+        cabeçalho + tabela + total em destaque) ou "recibo" (parágrafo
+        narrativo "Recebemos de..." + linha de assinatura). Totais
+        (`subtotalItem`, `subtotal`, `total`) são calculados pela API — não
+        são enviados pelo cliente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceRequest"
+            example:
+              tipo: fatura
+              numero: "0001/2026"
+              data: "2026-07-25"
+              vencimento: "2026-08-10"
+              emitente:
+                nome: "Atlas Soluções Digitais LTDA"
+                documento: "11.222.333/0001-81"
+                endereco: "Av. Paulista, 1000 - São Paulo/SP"
+                email: "financeiro@atlas.com.br"
+              destinatario:
+                nome: "Comércio Silva & Filhos ME"
+                documento: "22.333.444/0001-81"
+              itens:
+                - descricao: "Consultoria de implementação"
+                  quantidade: 20
+                  valor_unitario: 250
+                - descricao: "Licença mensal"
+                  quantidade: 1
+                  valor_unitario: 349.90
+              desconto: 100
+              forma_pagamento: "PIX"
+              observacoes: "Pagamento em até 10 dias."
+      responses:
+        "200":
+          description: PDF gerado com sucesso.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: >-
+            Corpo inválido — JSON malformado, campo obrigatório ausente,
+            CPF/CNPJ com dígito verificador inválido, ou campo acima do
+            limite de tamanho.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: invalid_params
+                message: 'emitente.documento "111.111.111-11" tem formato de CPF mas dígito verificador inválido'
+        "401":
+          description: >-
+            Missing or invalid `X-RapidAPI-Key`, or the request did not go
+            through the RapidAPI gateway (e.g. it was sent straight to the
+            origin host `faturapdf.com`). The gateway answers
+            `{"message":"Invalid API key..."}`; the origin answers
+            `{"error":"unauthorized"}`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: unauthorized
+                message: "Requisição não veio autenticada via RapidAPI."
+        "413":
+          description: Corpo da requisição excede o limite de tamanho (200KB).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Limite de uso do plano atingido (aplicado pelo RapidAPI, não pela API em si).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Erro interno ao gerar o PDF (mensagem sanitizada, sem stack trace).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: render_failed
+                message: "Falha interna ao gerar o PDF."
+        "504":
+          description: Geração do PDF excedeu o tempo limite interno (8s).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /receipt:
+    post:
+      operationId: generateReceipt
+      tags: [documents]
+      summary: Gera um PDF de recibo (atalho de /invoice com tipo="recibo")
+      description: >-
+        Mesmo corpo de `/invoice`, mas o campo `tipo` é sempre forçado para
+        `"recibo"` — atalho de conveniência pra quem só emite recibos e não
+        quer setar `tipo` manualmente a cada chamada.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceRequest"
+            example:
+              numero: "R-0087"
+              emitente:
+                nome: "Ana Luglio"
+                documento: "529.982.247-25"
+              destinatario:
+                nome: "Leonardo Sanches"
+                documento: "390.533.447-05"
+              itens:
+                - descricao: "Consultoria avulsa"
+                  valor_unitario: 450
+              forma_pagamento: "Transferência bancária"
+      responses:
+        "200":
+          description: PDF de recibo gerado com sucesso.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Corpo inválido (mesmas regras de `/invoice`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Missing or invalid `X-RapidAPI-Key` (same rules as `/invoice`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /health:
+    get:
+      operationId: healthCheck
+      tags: [documents]
+      summary: Service status
+      description: >-
+        Lightweight monitoring endpoint. It generates no document, but it is
+        served behind the same gateway, so it still requires a valid
+        `X-RapidAPI-Key` like every other operation.
+      responses:
+        "200":
+          description: Serviço no ar.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  service: { type: string }
+                  tipos: { type: array, items: { type: string } }
+              example:
+                ok: true
+                service: "invoice-api (netlify adapter)"
+                tipos: ["fatura", "recibo"]
+
+components:
+  schemas:
+    Party:
+      type: object
+      required: [nome]
+      properties:
+        nome:
+          type: string
+          maxLength: 200
+          example: "Atlas Soluções Digitais LTDA"
+        documento:
+          type: string
+          description: >-
+            CPF (11 dígitos) ou CNPJ (14 dígitos), com ou sem máscara.
+            Validado por dígito verificador — obrigatório em `emitente`,
+            opcional em `destinatario`.
+          example: "11.222.333/0001-81"
+        endereco:
+          type: string
+          maxLength: 300
+          example: "Av. Paulista, 1000 - São Paulo/SP"
+        email:
+          type: string
+          maxLength: 200
+          example: "financeiro@atlas.com.br"
+        telefone:
+          type: string
+          maxLength: 40
+          example: "(11) 4002-8922"
+
+    InvoiceItem:
+      type: object
+      required: [descricao, valor_unitario]
+      properties:
+        descricao:
+          type: string
+          maxLength: 200
+          example: "Consultoria de implementação"
+        quantidade:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          default: 1
+          example: 20
+        valor_unitario:
+          type: number
+          minimum: 0
+          description: Valor unitário em reais (ex. 349.90).
+          example: 250
+
+    InvoiceRequest:
+      type: object
+      required: [emitente, destinatario, itens]
+      properties:
+        tipo:
+          type: string
+          enum: [fatura, recibo]
+          default: fatura
+        numero:
+          type: string
+          maxLength: 60
+          example: "0001/2026"
+        data:
+          type: string
+          description: 'Aceita "AAAA-MM-DD" ou "DD/MM/AAAA". Default: data atual do servidor.'
+          example: "2026-07-25"
+        vencimento:
+          type: string
+          description: Mesmo formato de `data`. Só relevante em `tipo=fatura`.
+          example: "2026-08-10"
+        emitente:
+          allOf: [{ $ref: "#/components/schemas/Party" }]
+          description: Obrigatório. `documento` é obrigatório aqui.
+        destinatario:
+          allOf: [{ $ref: "#/components/schemas/Party" }]
+          description: Obrigatório (objeto). `documento` é opcional aqui.
+        itens:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items: { $ref: "#/components/schemas/InvoiceItem" }
+        desconto:
+          type: number
+          minimum: 0
+          default: 0
+          description: Subtraído do subtotal (o total nunca fica negativo).
+          example: 100
+        forma_pagamento:
+          type: string
+          maxLength: 100
+          example: "PIX"
+        observacoes:
+          type: string
+          maxLength: 2000
+          example: "Pagamento em até 10 dias."
+        pix_copia_cola:
+          type: string
+          maxLength: 600
+          description: >-
+            String "PIX copia e cola" (BR Code EMV) JÁ GERADA pelo próprio
+            banco/PSP do emitente. A API não gera o payload PIX — só o
+            transforma em uma imagem de QR Code embutida no PDF. Se omitido,
+            nenhuma seção de PIX aparece no documento.
+        mostrar_valor_por_extenso:
+          type: boolean
+          default: false
+          description: >-
+            Exibe o total por extenso em PT-BR (ex. "seis mil, cento e
+            quarenta e nove reais e noventa centavos") logo abaixo do total.
+            Em `tipo=recibo` isso já aparece automaticamente; em
+            `tipo=fatura` é opt-in via este campo.
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Código curto e estável do erro (usar para lógica de retry/tratamento).
+        message:
+          type: string
+          description: Mensagem legível, sem detalhes internos (nunca inclui stack trace).
+      required: [error, message]
+
+  securitySchemes:
+    RapidAPIKey:
+      type: apiKey
+      in: header
+      name: X-RapidAPI-Key
+      description: >-
+        Your personal RapidAPI application key. This is the ONLY credential a
+        consumer of this API sends. Get it (free tier: 20 documents/month, no
+        credit card) at
+        https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj
+        and send it on every request to the gateway host
+        `brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com`.
+        A missing or invalid key is rejected by the gateway with HTTP 401.
+
+    RapidAPIHost:
+      type: apiKey
+      in: header
+      name: X-RapidAPI-Host
+      description: >-
+        Optional companion header, always present in RapidAPI's generated code
+        snippets. Value:
+        `brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com`. Accepted
+        and recommended for compatibility with RapidAPI SDKs, but not required
+        when you address the gateway subdomain directly — `X-RapidAPI-Key`
+        alone is sufficient (verified against the live gateway).
+
+# Every operation requires the consumer's own RapidAPI key.
+# (Internally the gateway also injects a private proxy secret so the origin
+# can reject non-gateway traffic, but that header is never set by, visible to,
+# or relevant for the API consumer — so it is deliberately NOT part of this
+# public contract.)
+security:
+  - RapidAPIKey: []

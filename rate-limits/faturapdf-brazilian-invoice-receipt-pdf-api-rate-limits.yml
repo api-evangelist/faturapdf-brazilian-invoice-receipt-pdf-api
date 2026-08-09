@@ -1,0 +1,77 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: FaturaPDF — Brazilian Invoice & Receipt PDF API
+providerId: faturapdf-brazilian-invoice-receipt-pdf-api
+generated: '2026-08-09'
+method: searched
+created: '2026-08-09'
+modified: '2026-08-09'
+tags:
+  - Rate Limiting
+  - Invoices
+  - PDF Generation
+description: >-
+  There is no per-second or per-minute rate limit published. The only enforced limit is the
+  monthly document quota of the subscribed RapidAPI plan, applied by the gateway before the
+  request ever reaches the API. Two hard request-shape limits are documented separately and
+  are enforced by the API itself.
+sources:
+  - https://faturapdf.com/.well-known/api-onboarding
+  - https://faturapdf.com/guides/generate-invoice-pdf-nodejs/
+  - https://faturapdf.com/terms/
+  - https://faturapdf.com/openapi.yaml
+enforced_by: RapidAPI gateway (quota) and the API origin (request shape)
+headers:
+  requestId: null
+  rateLimit: >-
+    Standard RapidAPI X-RateLimit-* headers are emitted to subscribed callers. They could not be
+    captured anonymously — the gateway returns 401 at the root and 429 on every other path
+    without a subscriber key (probed 2026-08-09).
+responseCodes:
+  throttled: 429
+  payloadTooLarge: 413
+  renderTimeout: 504
+limits:
+  - name: Documents per month — Basic (free)
+    scope: subscription
+    metric: documents
+    limit: 20
+    timeFrame: month
+  - name: Documents per month — Pro
+    scope: subscription
+    metric: documents
+    limit: 500
+    timeFrame: month
+  - name: Documents per month — Business
+    scope: subscription
+    metric: documents
+    limit: 3000
+    timeFrame: month
+  - name: Documents per month — Enterprise
+    scope: subscription
+    metric: documents
+    limit: 15000
+    timeFrame: month
+  - name: Request body size
+    scope: request
+    metric: bytes
+    limit: 200000
+    timeFrame: request
+    note: '~200 KB of JSON; exceeded returns 413 payload_too_large.'
+  - name: Line items per document
+    scope: request
+    metric: items
+    limit: 200
+    timeFrame: request
+    note: 'itens[] maxItems; exceeded returns 413 payload_too_large.'
+  - name: Internal render timeout
+    scope: request
+    metric: seconds
+    limit: 8
+    timeFrame: request
+    note: Exceeded returns 504 render_timeout. Safe to retry.
+throttle_guidance: >-
+  A 429 means the monthly quota is spent, not that you are calling too fast — retrying only helps
+  if the quota resets or another worker frees capacity. In a batch job the provider recommends
+  treating 429 as fatal for the run rather than retrying. Unmetered: GET https://faturapdf.com/health.

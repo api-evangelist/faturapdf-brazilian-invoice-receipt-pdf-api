@@ -1,0 +1,82 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for FaturaPDF — Brazilian Invoice & Receipt PDF API
+  version: 1.0.0
+extends: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
+x-generated: '2026-08-09'
+x-method: generated
+x-source: >-
+  Enhancements derived from the artifacts in this repo (conventions/, errors/, lifecycle/,
+  sandbox/, authentication/, data-model/). The harvested spec is never mutated; this overlay
+  records what API Evangelist adds on top of it.
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-provider: faturapdf-brazilian-invoice-receipt-pdf-api
+      x-apievangelist-artifacts:
+        conventions: conventions/faturapdf-brazilian-invoice-receipt-pdf-api-conventions.yml
+        errors: errors/faturapdf-brazilian-invoice-receipt-pdf-api-problem-types.yml
+        lifecycle: lifecycle/faturapdf-brazilian-invoice-receipt-pdf-api-lifecycle.yml
+        sandbox: sandbox/faturapdf-brazilian-invoice-receipt-pdf-api-sandbox.yml
+        authentication: authentication/faturapdf-brazilian-invoice-receipt-pdf-api-authentication.yml
+        data_model: data-model/faturapdf-brazilian-invoice-receipt-pdf-api-data-model.yml
+        skills: skills/_index.yml
+      x-scope-limit: >-
+        Produces a formatted commercial document (fatura/recibo). NOT an NF-e / NFS-e fiscal
+        record — no SEFAZ or municipal integration, no chave de acesso, no DANFE, no signed XML.
+  - target: $.info
+    update:
+      x-idempotency:
+        supported: true
+        mechanism: inherently-idempotent
+        header: null
+        rationale: >-
+          Generation is a stateless pure function of the request body and nothing is persisted,
+          so a retry cannot duplicate a document. Determinism holds only when `data` is sent
+          explicitly; omitting it stamps the current server date.
+        retryable_statuses: [408, 429, 500, 502, 503, 504]
+        never_retry: [400, 401, 405, 413]
+  - target: $.servers
+    update:
+      x-origin-host-not-callable: >-
+        https://faturapdf.com serves the docs, spec and free browser tools only. Requests that
+        do not arrive through the RapidAPI gateway are rejected with 401 {"error":"unauthorized"}.
+  - target: $.tags[?(@.name=='documents')]
+    update:
+      x-agent-note: >-
+        A 2xx response body is raw PDF bytes; every other status is a JSON {error, message}
+        envelope. Branch on status or Content-Type before reading the body.
+  - target: $.paths./invoice.post
+    update:
+      x-agentic-access:
+        action-class: acting
+        consequence: write
+        audit: required
+        note: >-
+          Generates a billing document from caller-supplied party and line-item data. No money
+          moves and nothing is stored, but the output is a customer-facing financial document.
+      x-limits:
+        request_body_max_bytes: 200000
+        max_items: 200
+        render_timeout_seconds: 8
+  - target: $.paths./receipt.post
+    update:
+      x-agentic-access:
+        action-class: acting
+        consequence: write
+        audit: required
+      x-alias-of: generateInvoice with tipo forced to "recibo"
+  - target: $.paths./health.get
+    update:
+      x-agentic-access:
+        action-class: connected
+        consequence: read
+      x-unmetered: true
+      x-public-origin-url: https://faturapdf.com/health
+      x-note: >-
+        The origin copy at https://faturapdf.com/health is public and unauthenticated and does
+        not count as billed usage; the gateway copy documented in this spec requires a key.
+  - target: $.paths./invoice.post.responses.429
+    update:
+      x-enforced-by: RapidAPI gateway, before the request reaches the API
+      x-scope: monthly document quota for the subscribed plan

@@ -1,0 +1,95 @@
+generated: '2026-08-09'
+method: generated
+source: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
+curated: '2026-08-09'
+curation_note: >-
+  The mechanical heuristic classified both POST operations as consequence "physical" because
+  their descriptions contain payment/invoice keywords. That is an over-classification here and
+  has been curated down to "write": no money moves, no order is placed, nothing is transmitted
+  to a bank, a PSP or a tax authority. The operations render a PDF from caller-supplied data and
+  return the bytes; nothing is stored server-side and there is no resource to reverse. Token TTL
+  is raised from 300s to the write ceiling of 900s and the token-exchange / purpose-required
+  requirements are dropped accordingly. Curated against the provider's own scope statements at
+  https://faturapdf.com/terms/ and https://faturapdf.com/guides/brazilian-fiscal-documents/.
+description: >-
+  Recommended x-agentic-access execution contracts for exposing this API to AI agents. A
+  governance starting point, not a provider claim — review and bind `audience` per deployment.
+  See research/curity/agentic-governance/.
+summary:
+  operations: 3
+  by_action_class:
+    acting: 2
+    connected: 1
+  by_consequence:
+    write: 2
+    read: 1
+  human_in_the_loop_required: 0
+operations:
+- path: /invoice
+  method: post
+  operationId: generateInvoice
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+      exchange: false
+      purpose-required: false
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+  notes: >-
+    The output is a customer-facing financial document carrying real party names and tax IDs, so
+    audit the call even though the API itself is stateless. Two agent-specific hazards: the
+    success body is binary PDF (every other status is JSON), and omitting `data` stamps the
+    current server date, which breaks reproducibility across a midnight UTC boundary.
+- path: /receipt
+  method: post
+  operationId: generateReceipt
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+      exchange: false
+      purpose-required: false
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+  notes: >-
+    Same contract as generateInvoice with tipo forced to "recibo". A recibo asserts that money was
+    received — escalate to a human where the agent cannot verify that independently.
+- path: /health
+  method: get
+  operationId: healthCheck
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+  notes: >-
+    The origin copy at https://faturapdf.com/health is public, unauthenticated and unmetered —
+    prefer it for agent preflight so a liveness probe never spends document quota.
+out_of_scope_guardrail: >-
+  No operation in this API issues, cancels or registers a fiscal document. An agent must not
+  present the output as a Nota Fiscal Eletronica (NF-e/NFC-e/NFS-e), and must not claim a chave
+  de acesso, protocolo de autorizacao, DANFE or signed XML exists. If a task requires a real
+  nota fiscal, this API is the wrong tool and the agent should say so.
+personal_data_note: >-
+  Request payloads carry real personal and company identifiers (CPF, CNPJ, names, addresses,
+  emails). The provider states payload contents are not logged and nothing is persisted, but the
+  agent side must still treat these as personal data under LGPD and must never use a real
+  document as an illustrative example — synthetic check-digit-valid values are published at
+  https://faturapdf.com/cpf-cnpj.html.

@@ -1,0 +1,32 @@
+{
+  "x-generated": "2026-08-09",
+  "x-method": "derived",
+  "x-source": "openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml (400 response example) and https://faturapdf.com/guides/generate-invoice-pdf-nodejs/",
+  "operationId": "generateInvoice",
+  "scenario": "Invalid CPF/CNPJ check digit plus a missing required field",
+  "request": {
+    "method": "POST",
+    "url": "https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com/invoice",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY"
+    },
+    "body": {
+      "emitente": { "nome": "Atlas Soluções Digitais LTDA", "documento": "11.222.333/0001-99" },
+      "destinatario": { "nome": "Comércio Silva & Filhos ME" },
+      "itens": [{ "descricao": "Consultoria" }]
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": { "Content-Type": "application/json" },
+    "body": {
+      "error": "invalid_params",
+      "message": "emitente.documento \"11.222.333/0001-99\" tem formato de CNPJ mas digito verificador invalido; itens[0].valor_unitario e obrigatorio"
+    }
+  },
+  "notes": [
+    "Every validation failure is reported in one message, semicolon-separated — not one round-trip at a time.",
+    "Never retry a 400: it burns quota and the result will not change."
+  ]
+}

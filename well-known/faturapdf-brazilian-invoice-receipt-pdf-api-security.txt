@@ -1,0 +1,19 @@
+# Security policy for faturapdf.com — RFC 9116
+# Responsible disclosure is welcome. This is a small service; please allow a
+# reasonable window before public disclosure and we will respond in kind.
+
+Contact: mailto:leo.sanchees2014+arenaalfa@gmail.com
+Expires: 2027-08-07T00:00:00.000Z
+Preferred-Languages: en, pt-BR
+Canonical: https://faturapdf.com/.well-known/security.txt
+Policy: https://faturapdf.com/terms/
+
+# Scope
+#   IN SCOPE: faturapdf.com and its serverless endpoints (/invoice, /receipt,
+#             /health, /stats, /hit).
+#   OUT OF SCOPE: the RapidAPI gateway and marketplace (report those to
+#             RapidAPI directly), and denial-of-service testing of any kind.
+#
+# Please do NOT include real personal data (CPF, CNPJ, names) in a report.
+# Synthetic, check-digit-valid test documents can be generated at
+# https://faturapdf.com/cpf-cnpj.html

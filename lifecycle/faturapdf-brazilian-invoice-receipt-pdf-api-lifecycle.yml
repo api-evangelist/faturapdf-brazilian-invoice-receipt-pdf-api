@@ -1,0 +1,60 @@
+generated: '2026-08-09'
+method: searched
+source: >-
+  https://faturapdf.com/terms/ (availability + scope), https://faturapdf.com/openapi.yaml
+  (info.version), https://faturapdf.com/health (live status endpoint), and
+  https://faturapdf.com/.well-known/api-onboarding (plan/quota lifecycle). Probed 2026-08-09.
+versioning:
+  scheme: document-version
+  current: 0.3.0
+  mechanism: >-
+    The OpenAPI document carries info.version. There is no version segment in the path
+    (endpoints are /invoice, /receipt, /health) and no version request header. Consumers
+    cannot pin a version.
+  docs: https://faturapdf.com/openapi.yaml
+  gap: >-
+    No published versioning policy. A breaking change to the request schema would reach
+    every caller at once. This is the single clearest lifecycle gap for the provider to close.
+deprecation:
+  policy_url: null
+  sunset_header: false
+  deprecated_operations: []
+  notes: >-
+    No deprecation policy, no RFC 8594 Sunset/Deprecation header support, and no operation
+    in the OpenAPI carries deprecated: true. The spec does document two accepted path
+    aliases (/fatura for /invoice, /recibo for /receipt) but declares neither deprecated.
+sla:
+  url: null
+  uptime_target: null
+  notes: >-
+    The provider states there is no SLA, verbatim: "this runs on serverless functions on a
+    free hosting tier, and no uptime guarantee is offered. It is not an SLA-backed service
+    and should not be placed in a path where an outage causes real harm without a fallback."
+    (https://faturapdf.com/terms/). Recorded as published, not as a deficiency hidden from callers.
+status_page: https://faturapdf.com/health
+status_page_kind: health-endpoint
+status_page_notes: >-
+  Not a hosted status page with incident history — a public, unauthenticated JSON health
+  endpoint that the provider itself declares as its status surface (type StatusPage in
+  https://faturapdf.com/apis.json, and "API status" in the site footer). Verified 2026-08-09:
+  HTTP 200, {"ok":true,"service":"invoice-api (netlify adapter)","tipos":["fatura","recibo"]}.
+  Explicitly free to poll and not counted as billed usage.
+changelog: null
+changelog_notes: >-
+  No dated changelog is published. The only version signals are OpenAPI info.version (0.3.0)
+  and the modified date in https://faturapdf.com/apis.json (2026-08-07). No changelog/
+  artifact is emitted rather than manufacture one.
+roadmap: null
+roadmap_notes: >-
+  No roadmap page. The onboarding descriptor's gaps[] block is the nearest thing — it names
+  known limits (alphanumeric CNPJ not yet accepted, fixed layout, no custom templates, no
+  PIX minting) but commits to no dates.
+platform_dependencies:
+  - name: RapidAPI
+    role: >-
+      Owns the gateway, metering, quota, billing and key issuance. FaturaPDF runs no signup
+      of its own and cannot adjust a subscriber's quota. A RapidAPI outage or listing change
+      is an availability event for this API.
+    url: https://rapidapi.com/leosanchees2014/api/brazilian-invoice-receipt-pdf-api-cpf-cnpj
+  - name: Netlify
+    role: Serverless hosting of the origin and generation functions (free tier, per the terms page).
