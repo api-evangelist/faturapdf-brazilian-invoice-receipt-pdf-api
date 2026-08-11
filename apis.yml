@@ -27,34 +27,21 @@ tags:
   - Fintech
   - Data Validation
 apis:
-  - name: FaturaPDF Invoice & Receipt API
-    description: >-
-      REST API with two POST endpoints (/invoice, /receipt) that generate Brazilian invoice or receipt PDFs, plus a
-      public /health endpoint. Authenticated via RapidAPI API key. Backed by a public OpenAPI 3.0.3 spec, llms.txt,
-      APIs.json index, and an API onboarding descriptor.
-    humanURL: https://faturapdf.com/guides/
-    baseURL: https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com
-    tags:
-      - Invoices
-      - Receipts
-      - PDF Generation
-      - Documents
-      - Brazil
-      - Billing
-      - CPF Validation
-      - CNPJ Validation
-      - PIX
-      - Fintech
-      - Data Validation
-    properties:
-      - type: OpenAPI
-        url: https://faturapdf.com/openapi.yaml
-      - type: OpenAPI
-        url: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
-      - type: LLMSTxt
-        url: https://faturapdf.com/llms.txt
-      - type: Documentation
-        url: https://faturapdf.com/guides/
+- aid: >-
+    faturapdf-brazilian-invoice-receipt-pdf-api:faturapdf-brazilian-invoice-receipt-pdf-api-documents-api
+  name: FaturaPDF — Brazilian Invoice & Receipt PDF API Documents API
+  description: Geração de fatura/recibo em PDF
+  humanURL: https://faturapdf.com/guides/
+  baseURL: https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com
+  tags:
+  - documents
+  properties:
+  - type: OpenAPI
+    url: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-documents-api-openapi.yml
+  - type: LLMSTxt
+    url: https://faturapdf.com/llms.txt
+  - type: Documentation
+    url: https://faturapdf.com/guides/
 maintainers:
   - FN: FaturaPDF — Brazilian Invoice & Receipt PDF API
     url: https://faturapdf.com/
@@ -65,6 +52,8 @@ generated:
   confidence: 95
   at: '2026-08-07T01:32:03.766Z'
 common:
+- type: MCPServer
+  url: mcp/faturapdf-brazilian-invoice-receipt-pdf-api-mcp.yml
 - type: DeveloperPortal
   url: https://faturapdf.com/
 - type: Documentation
@@ -88,7 +77,7 @@ common:
 - type: Security
   url: https://faturapdf.com/.well-known/security.txt
 - type: OpenAPI
-  url: openapi/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
+  url: openapi/_original/faturapdf-brazilian-invoice-receipt-pdf-api-openapi-original.yml
 - type: LLMsTxt
   url: llms/faturapdf-brazilian-invoice-receipt-pdf-api-llms.txt
 - type: WellKnown
