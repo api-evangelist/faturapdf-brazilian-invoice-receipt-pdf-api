@@ -10,7 +10,7 @@ description: >-
   invoice/receipt generator, a CPF/CNPJ generator-validator and a PIX BR Code builder, two of them embeddable as
   iframes.
 image: https://faturapdf.com/og-cover.png
-url: https://faturapdf-brazilian-invoice-receipt-pdf-api.apievangelist.com/apis.yml
+url: https://raw.githubusercontent.com/api-evangelist/faturapdf-brazilian-invoice-receipt-pdf-api/refs/heads/main/apis.yml
 created: '2026-08-07'
 modified: '2026-08-09'
 specificationVersion: '0.21'
