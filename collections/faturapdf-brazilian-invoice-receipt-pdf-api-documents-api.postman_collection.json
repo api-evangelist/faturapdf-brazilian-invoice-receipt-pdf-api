@@ -1,0 +1,733 @@
+{
+  "item": [
+    {
+      "id": "9367edba-a5d5-498b-bef3-1c350bafb0e0",
+      "name": "documents",
+      "description": {
+        "content": "Geração de fatura/recibo em PDF",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "d4bd46a7-37f2-474c-895c-50eb178f20f6",
+          "name": "Gera um PDF de fatura ou recibo",
+          "request": {
+            "name": "Gera um PDF de fatura ou recibo",
+            "description": {
+              "content": "Recebe emitente, destinatário, itens e metadados via JSON e devolve os bytes do PDF pronto. `tipo` controla o layout: \"fatura\" (default, cabeçalho + tabela + total em destaque) ou \"recibo\" (parágrafo narrativo \"Recebemos de...\" + linha de assinatura). Totais (`subtotalItem`, `subtotal`, `total`) são calculados pela API — não são enviados pelo cliente.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "invoice"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/pdf"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emitente\": {\n    \"nome\": \"<string>\",\n    \"documento\": \"<string>\",\n    \"endereco\": \"<string>\",\n    \"email\": \"<string>\",\n    \"telefone\": \"<string>\"\n  },\n  \"destinatario\": {\n    \"nome\": \"<string>\",\n    \"documento\": \"<string>\",\n    \"endereco\": \"<string>\",\n    \"email\": \"<string>\",\n    \"telefone\": \"<string>\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"<string>\",\n      \"valor_unitario\": \"<number>\",\n      \"quantidade\": 1\n    }\n  ],\n  \"tipo\": \"fatura\",\n  \"numero\": \"<string>\",\n  \"data\": \"<string>\",\n  \"vencimento\": \"<string>\",\n  \"desconto\": 0,\n  \"forma_pagamento\": \"<string>\",\n  \"observacoes\": \"<string>\",\n  \"pix_copia_cola\": \"<string>\",\n  \"mostrar_valor_por_extenso\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "3ed0fc29-1a27-4f5a-bbda-c6a9c9e45e69",
+              "name": "PDF gerado com sucesso.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "invoice"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/pdf"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipo\": \"fatura\",\n  \"numero\": \"0001/2026\",\n  \"data\": \"2026-07-25\",\n  \"vencimento\": \"2026-08-10\",\n  \"emitente\": {\n    \"nome\": \"Atlas Soluções Digitais LTDA\",\n    \"documento\": \"11.222.333/0001-81\",\n    \"endereco\": \"Av. Paulista, 1000 - São Paulo/SP\",\n    \"email\": \"financeiro@atlas.com.br\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Comércio Silva & Filhos ME\",\n    \"documento\": \"22.333.444/0001-81\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria de implementação\",\n      \"quantidade\": 20,\n      \"valor_unitario\": 250\n    },\n    {\n      \"descricao\": \"Licença mensal\",\n      \"quantidade\": 1,\n      \"valor_unitario\": 349.9\n    }\n  ],\n  \"desconto\": 100,\n  \"forma_pagamento\": \"PIX\",\n  \"observacoes\": \"Pagamento em até 10 dias.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/pdf"
+                }
+              ],
+              "body": "string",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "8b869362-c6ab-4784-971e-3b2face790b4",
+              "name": "Corpo inválido — JSON malformado, campo obrigatório ausente, CPF/CNPJ com dígito verificador inválido, ou campo acima do limite de tamanho.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "invoice"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipo\": \"fatura\",\n  \"numero\": \"0001/2026\",\n  \"data\": \"2026-07-25\",\n  \"vencimento\": \"2026-08-10\",\n  \"emitente\": {\n    \"nome\": \"Atlas Soluções Digitais LTDA\",\n    \"documento\": \"11.222.333/0001-81\",\n    \"endereco\": \"Av. Paulista, 1000 - São Paulo/SP\",\n    \"email\": \"financeiro@atlas.com.br\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Comércio Silva & Filhos ME\",\n    \"documento\": \"22.333.444/0001-81\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria de implementação\",\n      \"quantidade\": 20,\n      \"valor_unitario\": 250\n    },\n    {\n      \"descricao\": \"Licença mensal\",\n      \"quantidade\": 1,\n      \"valor_unitario\": 349.9\n    }\n  ],\n  \"desconto\": 100,\n  \"forma_pagamento\": \"PIX\",\n  \"observacoes\": \"Pagamento em até 10 dias.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"invalid_params\",\n  \"message\": \"emitente.documento \\\"111.111.111-11\\\" tem formato de CPF mas dígito verificador inválido\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bc93e383-9e4a-477c-9060-c2efec85a355",
+              "name": "Missing or invalid `X-RapidAPI-Key`, or the request did not go through the RapidAPI gateway (e.g. it was sent straight to the origin host `faturapdf.com`). The gateway answers `{\"message\":\"Invalid API key...\"}`; the origin answers `{\"error\":\"unauthorized\"}`.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "invoice"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipo\": \"fatura\",\n  \"numero\": \"0001/2026\",\n  \"data\": \"2026-07-25\",\n  \"vencimento\": \"2026-08-10\",\n  \"emitente\": {\n    \"nome\": \"Atlas Soluções Digitais LTDA\",\n    \"documento\": \"11.222.333/0001-81\",\n    \"endereco\": \"Av. Paulista, 1000 - São Paulo/SP\",\n    \"email\": \"financeiro@atlas.com.br\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Comércio Silva & Filhos ME\",\n    \"documento\": \"22.333.444/0001-81\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria de implementação\",\n      \"quantidade\": 20,\n      \"valor_unitario\": 250\n    },\n    {\n      \"descricao\": \"Licença mensal\",\n      \"quantidade\": 1,\n      \"valor_unitario\": 349.9\n    }\n  ],\n  \"desconto\": 100,\n  \"forma_pagamento\": \"PIX\",\n  \"observacoes\": \"Pagamento em até 10 dias.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"unauthorized\",\n  \"message\": \"Requisição não veio autenticada via RapidAPI.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d250aa84-ed72-4497-a620-c808405bbe54",
+              "name": "Corpo da requisição excede o limite de tamanho (200KB).",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "invoice"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipo\": \"fatura\",\n  \"numero\": \"0001/2026\",\n  \"data\": \"2026-07-25\",\n  \"vencimento\": \"2026-08-10\",\n  \"emitente\": {\n    \"nome\": \"Atlas Soluções Digitais LTDA\",\n    \"documento\": \"11.222.333/0001-81\",\n    \"endereco\": \"Av. Paulista, 1000 - São Paulo/SP\",\n    \"email\": \"financeiro@atlas.com.br\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Comércio Silva & Filhos ME\",\n    \"documento\": \"22.333.444/0001-81\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria de implementação\",\n      \"quantidade\": 20,\n      \"valor_unitario\": 250\n    },\n    {\n      \"descricao\": \"Licença mensal\",\n      \"quantidade\": 1,\n      \"valor_unitario\": 349.9\n    }\n  ],\n  \"desconto\": 100,\n  \"forma_pagamento\": \"PIX\",\n  \"observacoes\": \"Pagamento em até 10 dias.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Request Entity Too Large",
+              "code": 413,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bbbc58e0-0982-4919-a4c5-09e40ad1a2cb",
+              "name": "Limite de uso do plano atingido (aplicado pelo RapidAPI, não pela API em si).",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "invoice"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipo\": \"fatura\",\n  \"numero\": \"0001/2026\",\n  \"data\": \"2026-07-25\",\n  \"vencimento\": \"2026-08-10\",\n  \"emitente\": {\n    \"nome\": \"Atlas Soluções Digitais LTDA\",\n    \"documento\": \"11.222.333/0001-81\",\n    \"endereco\": \"Av. Paulista, 1000 - São Paulo/SP\",\n    \"email\": \"financeiro@atlas.com.br\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Comércio Silva & Filhos ME\",\n    \"documento\": \"22.333.444/0001-81\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria de implementação\",\n      \"quantidade\": 20,\n      \"valor_unitario\": 250\n    },\n    {\n      \"descricao\": \"Licença mensal\",\n      \"quantidade\": 1,\n      \"valor_unitario\": 349.9\n    }\n  ],\n  \"desconto\": 100,\n  \"forma_pagamento\": \"PIX\",\n  \"observacoes\": \"Pagamento em até 10 dias.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f5a60b79-6ecc-4379-a570-c036209c2159",
+              "name": "Erro interno ao gerar o PDF (mensagem sanitizada, sem stack trace).",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "invoice"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipo\": \"fatura\",\n  \"numero\": \"0001/2026\",\n  \"data\": \"2026-07-25\",\n  \"vencimento\": \"2026-08-10\",\n  \"emitente\": {\n    \"nome\": \"Atlas Soluções Digitais LTDA\",\n    \"documento\": \"11.222.333/0001-81\",\n    \"endereco\": \"Av. Paulista, 1000 - São Paulo/SP\",\n    \"email\": \"financeiro@atlas.com.br\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Comércio Silva & Filhos ME\",\n    \"documento\": \"22.333.444/0001-81\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria de implementação\",\n      \"quantidade\": 20,\n      \"valor_unitario\": 250\n    },\n    {\n      \"descricao\": \"Licença mensal\",\n      \"quantidade\": 1,\n      \"valor_unitario\": 349.9\n    }\n  ],\n  \"desconto\": 100,\n  \"forma_pagamento\": \"PIX\",\n  \"observacoes\": \"Pagamento em até 10 dias.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"render_failed\",\n  \"message\": \"Falha interna ao gerar o PDF.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "af3d6ede-f12f-4a0e-9173-cfed6f8f1db1",
+              "name": "Geração do PDF excedeu o tempo limite interno (8s).",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "invoice"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipo\": \"fatura\",\n  \"numero\": \"0001/2026\",\n  \"data\": \"2026-07-25\",\n  \"vencimento\": \"2026-08-10\",\n  \"emitente\": {\n    \"nome\": \"Atlas Soluções Digitais LTDA\",\n    \"documento\": \"11.222.333/0001-81\",\n    \"endereco\": \"Av. Paulista, 1000 - São Paulo/SP\",\n    \"email\": \"financeiro@atlas.com.br\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Comércio Silva & Filhos ME\",\n    \"documento\": \"22.333.444/0001-81\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria de implementação\",\n      \"quantidade\": 20,\n      \"valor_unitario\": 250\n    },\n    {\n      \"descricao\": \"Licença mensal\",\n      \"quantidade\": 1,\n      \"valor_unitario\": 349.9\n    }\n  ],\n  \"desconto\": 100,\n  \"forma_pagamento\": \"PIX\",\n  \"observacoes\": \"Pagamento em até 10 dias.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Gateway Timeout",
+              "code": 504,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d45932b7-db6c-4963-be33-9ab488dfb6af",
+          "name": "Gera um PDF de recibo (atalho de /invoice com tipo=\"recibo\")",
+          "request": {
+            "name": "Gera um PDF de recibo (atalho de /invoice com tipo=\"recibo\")",
+            "description": {
+              "content": "Mesmo corpo de `/invoice`, mas o campo `tipo` é sempre forçado para `\"recibo\"` — atalho de conveniência pra quem só emite recibos e não quer setar `tipo` manualmente a cada chamada.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "receipt"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/pdf"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emitente\": {\n    \"nome\": \"<string>\",\n    \"documento\": \"<string>\",\n    \"endereco\": \"<string>\",\n    \"email\": \"<string>\",\n    \"telefone\": \"<string>\"\n  },\n  \"destinatario\": {\n    \"nome\": \"<string>\",\n    \"documento\": \"<string>\",\n    \"endereco\": \"<string>\",\n    \"email\": \"<string>\",\n    \"telefone\": \"<string>\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"<string>\",\n      \"valor_unitario\": \"<number>\",\n      \"quantidade\": 1\n    }\n  ],\n  \"tipo\": \"fatura\",\n  \"numero\": \"<string>\",\n  \"data\": \"<string>\",\n  \"vencimento\": \"<string>\",\n  \"desconto\": 0,\n  \"forma_pagamento\": \"<string>\",\n  \"observacoes\": \"<string>\",\n  \"pix_copia_cola\": \"<string>\",\n  \"mostrar_valor_por_extenso\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "5ccca243-2004-46d4-90de-08ece7367f26",
+              "name": "PDF de recibo gerado com sucesso.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "receipt"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/pdf"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"R-0087\",\n  \"emitente\": {\n    \"nome\": \"Ana Luglio\",\n    \"documento\": \"529.982.247-25\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Leonardo Sanches\",\n    \"documento\": \"390.533.447-05\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria avulsa\",\n      \"valor_unitario\": 450\n    }\n  ],\n  \"forma_pagamento\": \"Transferência bancária\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/pdf"
+                }
+              ],
+              "body": "string",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "d59c94bb-2208-4e4a-abea-c11362b23a84",
+              "name": "Corpo inválido (mesmas regras de `/invoice`).",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "receipt"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"R-0087\",\n  \"emitente\": {\n    \"nome\": \"Ana Luglio\",\n    \"documento\": \"529.982.247-25\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Leonardo Sanches\",\n    \"documento\": \"390.533.447-05\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria avulsa\",\n      \"valor_unitario\": 450\n    }\n  ],\n  \"forma_pagamento\": \"Transferência bancária\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b8f37a20-1364-4018-b334-a1bbca0adba2",
+              "name": "Missing or invalid `X-RapidAPI-Key` (same rules as `/invoice`).",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "receipt"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"R-0087\",\n  \"emitente\": {\n    \"nome\": \"Ana Luglio\",\n    \"documento\": \"529.982.247-25\"\n  },\n  \"destinatario\": {\n    \"nome\": \"Leonardo Sanches\",\n    \"documento\": \"390.533.447-05\"\n  },\n  \"itens\": [\n    {\n      \"descricao\": \"Consultoria avulsa\",\n      \"valor_unitario\": 450\n    }\n  ],\n  \"forma_pagamento\": \"Transferência bancária\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "60bd4e1f-b877-40f2-b2e7-3f251d93fce5",
+          "name": "Service status",
+          "request": {
+            "name": "Service status",
+            "description": {
+              "content": "Lightweight monitoring endpoint. It generates no document, but it is served behind the same gateway, so it still requires a valid `X-RapidAPI-Key` like every other operation.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "health"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "b770bf50-b1b9-4b82-a5f2-314166f4d87f",
+              "name": "Serviço no ar.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "health"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "X-RapidAPI-Key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ok\": true,\n  \"service\": \"invoice-api (netlify adapter)\",\n  \"tipos\": [\n    \"fatura\",\n    \"recibo\"\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-RapidAPI-Key"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}"
+      },
+      {
+        "key": "in",
+        "value": "header"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "bd1f78f2-c05c-4c56-8449-82292e4abf15",
+    "name": "Brazilian Invoice & Receipt PDF Documents API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Generates a professional invoice (\"fatura\") or receipt (\"recibo\") PDF from a JSON payload. Native Brazilian fiscal fields: CPF/CNPJ (masked and checksum-validated), BRL currency formatting, DD/MM/YYYY dates, PT-BR labels. Rendered with a pure-JS PDF engine (no headless browser), so it's fast and deterministic.\n\n## NOT an NF-e / NFS-e issuer\n\nThis API produces a **formatted commercial document** (fatura/recibo) — it is **NOT** a tax-authority-authorized fiscal record. It does not talk to SEFAZ or to any municipal NFS-e system, does not issue or cancel NF-e / NFC-e / NFS-e, does not produce a chave de acesso, protocolo de autorização, DANFE or XML assinado. If you legally need a nota fiscal, use an authorized issuer. Use this API for the commercial paperwork around the sale (billing document, receipt, payment request).\n\n## How to call it (the real contract)\n\nThe API is distributed **through the RapidAPI gateway**. Send your requests to `https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com` with your personal `X-RapidAPI-Key` header (see `securitySchemes`). RapidAPI's own code snippets also send `X-RapidAPI-Host`; that header is accepted and recommended, but not required when you address the gateway subdomain directly.\n\nThe origin host `https://faturapdf.com` hosts the docs, the free web tools and this specification, but it is **not directly callable**: origin requests that did not come through the gateway are rejected with HTTP 401 (`{\"error\":\"unauthorized\"}`). Do not point a client at `faturapdf.com`.\n\nFree tier: 20 documents/month, no credit card.\n\nContact Support:\n Name: FaturaPDF Support",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Brazilian Invoice & Receipt PDF Documents API",
+    "version": "0.3.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "X-RapidAPI-Key",
+      "value": "{{X-RapidAPI-Key}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "documents",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Gera um PDF de fatura ou recibo",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com/invoice",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Recebe emitente, destinatário, itens e metadados via JSON e devolve os bytes do PDF pronto. `tipo` controla o layout: \"fatura\" (default, cabeçalho + tabela + total em destaque) ou \"recibo\" (parágrafo narrativo \"Recebemos de...\" + linha de assinatura). Totais (`subtotalItem`, `subtotal`, `total`) são calculados pela API — não são enviados pelo cliente."
+        },
+        {
+          "info": {
+            "name": "Gera um PDF de recibo (atalho de /invoice com tipo=\"recibo\")",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com/receipt",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Mesmo corpo de `/invoice`, mas o campo `tipo` é sempre forçado para `\"recibo\"` — atalho de conveniência pra quem só emite recibos e não quer setar `tipo` manualmente a cada chamada."
+        },
+        {
+          "info": {
+            "name": "Service status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com/health"
+          },
+          "docs": "Lightweight monitoring endpoint. It generates no document, but it is served behind the same gateway, so it still requires a valid `X-RapidAPI-Key` like every other operation."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
