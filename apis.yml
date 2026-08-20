@@ -23,6 +23,18 @@ tags:
   - Billing
   - CPF Validation
   - CNPJ Validation
+  - Pix
+  - Fintech
+  - Data Validation
+tags_raw:
+  - Invoices
+  - Receipts
+  - PDF Generation
+  - Documents
+  - Brazil
+  - Billing
+  - CPF Validation
+  - CNPJ Validation
   - PIX
   - Fintech
   - Data Validation
@@ -34,6 +46,8 @@ apis:
   humanURL: https://faturapdf.com/guides/
   baseURL: https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com
   tags:
+  - Documents
+  tags_raw:
   - documents
   properties:
   - type: OpenAPI
