@@ -1,25 +1,7 @@
 openapi: 3.2.0
 info:
   title: Brazilian Invoice & Receipt PDF Documents API
-  description: 'Generates a professional invoice ("fatura") or receipt ("recibo") PDF from a JSON payload. Native Brazilian fiscal fields: CPF/CNPJ (masked and checksum-validated), BRL currency formatting, DD/MM/YYYY dates, PT-BR labels. Rendered with a pure-JS PDF engine (no headless browser), so it''s fast and deterministic.
-
-
-    ## NOT an NF-e / NFS-e issuer
-
-
-    This API produces a **formatted commercial document** (fatura/recibo) — it is **NOT** a tax-authority-authorized fiscal record. It does not talk to SEFAZ or to any municipal NFS-e system, does not issue or cancel NF-e / NFC-e / NFS-e, does not produce a chave de acesso, protocolo de autorização, DANFE or XML assinado. If you legally need a nota fiscal, use an authorized issuer. Use this API for the commercial paperwork around the sale (billing document, receipt, payment request).
-
-
-    ## How to call it (the real contract)
-
-
-    The API is distributed **through the RapidAPI gateway**. Send your requests to `https://brazilian-invoice-receipt-pdf-api-cpf-cnpj.p.rapidapi.com` with your personal `X-RapidAPI-Key` header (see `securitySchemes`). RapidAPI''s own code snippets also send `X-RapidAPI-Host`; that header is accepted and recommended, but not required when you address the gateway subdomain directly.
-
-
-    The origin host `https://faturapdf.com` hosts the docs, the free web tools and this specification, but it is **not directly callable**: origin requests that did not come through the gateway are rejected with HTTP 401 (`{"error":"unauthorized"}`). Do not point a client at `faturapdf.com`.
-
-
-    Free tier: 20 documents/month, no credit card.'
+  description: Generates a professional invoice ("fatura") or receipt ("recibo") PDF from a JSON payload.
   version: 0.3.0
   termsOfService: https://faturapdf.com/terms/
   contact:
@@ -33,14 +15,14 @@ servers:
 security:
 - RapidAPIKey: []
 tags:
-- name: documents
+- name: Documents
   description: Geração de fatura/recibo em PDF
 paths:
   /invoice:
     post:
       operationId: generateInvoice
       tags:
-      - documents
+      - Documents
       summary: Gera um PDF de fatura ou recibo
       description: 'Recebe emitente, destinatário, itens e metadados via JSON e devolve os bytes do PDF pronto. `tipo` controla o layout: "fatura" (default, cabeçalho + tabela + total em destaque) ou "recibo" (parágrafo narrativo "Recebemos de..." + linha de assinatura). Totais (`subtotalItem`, `subtotal`, `total`) são calculados pela API — não são enviados pelo cliente.'
       requestBody:
@@ -129,7 +111,7 @@ paths:
     post:
       operationId: generateReceipt
       tags:
-      - documents
+      - Documents
       summary: Gera um PDF de recibo (atalho de /invoice com tipo="recibo")
       description: Mesmo corpo de `/invoice`, mas o campo `tipo` é sempre forçado para `"recibo"` — atalho de conveniência pra quem só emite recibos e não quer setar `tipo` manualmente a cada chamada.
       requestBody:
@@ -174,7 +156,7 @@ paths:
     get:
       operationId: healthCheck
       tags:
-      - documents
+      - Documents
       summary: Service status
       description: Lightweight monitoring endpoint. It generates no document, but it is served behind the same gateway, so it still requires a valid `X-RapidAPI-Key` like every other operation.
       responses:
@@ -201,6 +183,38 @@ paths:
                 - recibo
 components:
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Código curto e estável do erro (usar para lógica de retry/tratamento).
+        message:
+          type: string
+          description: Mensagem legível, sem detalhes internos (nunca inclui stack trace).
+      required:
+      - error
+      - message
+    InvoiceItem:
+      type: object
+      required:
+      - descricao
+      - valor_unitario
+      properties:
+        descricao:
+          type: string
+          maxLength: 200
+          example: Consultoria de implementação
+        quantidade:
+          type: number
+          default: 1
+          example: 20
+          exclusiveMinimum: 0
+        valor_unitario:
+          type: number
+          minimum: 0
+          description: Valor unitário em reais (ex. 349.90).
+          example: 250
     InvoiceRequest:
       type: object
       required:
@@ -262,18 +276,6 @@ components:
           type: boolean
           default: false
           description: Exibe o total por extenso em PT-BR (ex. "seis mil, cento e quarenta e nove reais e noventa centavos") logo abaixo do total. Em `tipo=recibo` isso já aparece automaticamente; em `tipo=fatura` é opt-in via este campo.
-    ErrorResponse:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Código curto e estável do erro (usar para lógica de retry/tratamento).
-        message:
-          type: string
-          description: Mensagem legível, sem detalhes internos (nunca inclui stack trace).
-      required:
-      - error
-      - message
     Party:
       type: object
       required:
@@ -299,26 +301,6 @@ components:
           type: string
           maxLength: 40
           example: (11) 4002-8922
-    InvoiceItem:
-      type: object
-      required:
-      - descricao
-      - valor_unitario
-      properties:
-        descricao:
-          type: string
-          maxLength: 200
-          example: Consultoria de implementação
-        quantidade:
-          type: number
-          default: 1
-          example: 20
-          exclusiveMinimum: 0
-        valor_unitario:
-          type: number
-          minimum: 0
-          description: Valor unitário em reais (ex. 349.90).
-          example: 250
   securitySchemes:
     RapidAPIKey:
       type: apiKey
