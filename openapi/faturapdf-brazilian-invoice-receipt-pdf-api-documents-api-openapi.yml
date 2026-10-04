@@ -195,6 +195,31 @@ components:
       required:
       - error
       - message
+    Party:
+      type: object
+      required:
+      - nome
+      properties:
+        nome:
+          type: string
+          maxLength: 200
+          example: Atlas Soluções Digitais LTDA
+        documento:
+          type: string
+          description: CPF (11 dígitos) ou CNPJ (14 dígitos), com ou sem máscara. Validado por dígito verificador — obrigatório em `emitente`, opcional em `destinatario`.
+          example: 11.222.333/0001-81
+        endereco:
+          type: string
+          maxLength: 300
+          example: Av. Paulista, 1000 - São Paulo/SP
+        email:
+          type: string
+          maxLength: 200
+          example: financeiro@atlas.com.br
+        telefone:
+          type: string
+          maxLength: 40
+          example: (11) 4002-8922
     InvoiceItem:
       type: object
       required:
@@ -276,31 +301,6 @@ components:
           type: boolean
           default: false
           description: Exibe o total por extenso em PT-BR (ex. "seis mil, cento e quarenta e nove reais e noventa centavos") logo abaixo do total. Em `tipo=recibo` isso já aparece automaticamente; em `tipo=fatura` é opt-in via este campo.
-    Party:
-      type: object
-      required:
-      - nome
-      properties:
-        nome:
-          type: string
-          maxLength: 200
-          example: Atlas Soluções Digitais LTDA
-        documento:
-          type: string
-          description: CPF (11 dígitos) ou CNPJ (14 dígitos), com ou sem máscara. Validado por dígito verificador — obrigatório em `emitente`, opcional em `destinatario`.
-          example: 11.222.333/0001-81
-        endereco:
-          type: string
-          maxLength: 300
-          example: Av. Paulista, 1000 - São Paulo/SP
-        email:
-          type: string
-          maxLength: 200
-          example: financeiro@atlas.com.br
-        telefone:
-          type: string
-          maxLength: 40
-          example: (11) 4002-8922
   securitySchemes:
     RapidAPIKey:
       type: apiKey
